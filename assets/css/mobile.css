@@ -1,0 +1,423 @@
+/**
+ * Glandore — Mobile layer (service mode)
+ * All mobile-specific behaviour lives here.
+ * Desktop + shared styles stay in style.css.
+ */
+
+/* ========================================================================== */
+/* 0) Global guardrails                                                       */
+/* ========================================================================== */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+img,
+video,
+iframe,
+embed,
+object {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Desktop defaults: canonical header/footer only */
+.header-desktop {
+  display: block;
+}
+
+.header-mobile,
+.g-mobile-header {
+  display: none;
+}
+
+.footer-desktop {
+  display: block;
+}
+
+.footer-mobile {
+  display: none;
+}
+
+/* Hard desktop guard */
+@media (min-width: 769px) {
+  .header-desktop {
+    display: block !important;
+  }
+
+  .header-mobile,
+  .g-mobile-header {
+    display: none !important;
+  }
+
+  .footer-desktop {
+    display: block !important;
+  }
+
+  .footer-mobile {
+    display: none !important;
+  }
+}
+
+/* ========================================================================== */
+/* 1) Mobile overrides                                                        */
+/* ========================================================================== */
+
+@media (max-width: 768px) {
+
+  body {
+    font-size: 1.2rem;
+    line-height: 1.0;
+  }
+
+  main,
+  .site-main,
+  .content-area,
+  .entry-content,
+  .page-content,
+  .container,
+  .wrap {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  h1 {
+    font-size: 1.9rem;
+    line-height: 1.15;
+    margin: 0 0 0.75rem;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+    line-height: 1.2;
+    margin: 1.1rem 0 0.6rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+    line-height: 1.25;
+    margin: 1rem 0 0.5rem;
+  }
+
+  p {
+    margin: 0 0 0.85rem;
+  }
+
+  ul,
+  ol {
+    padding-left: 1.2rem;
+    margin: 0 0 0.85rem;
+  }
+
+  li {
+    margin: 0.2rem 0;
+  }
+
+  blockquote {
+    margin: 1rem 0;
+    padding: 0.6rem 0.9rem;
+    border-left: 3px solid currentColor;
+  }
+
+  a {
+    text-underline-offset: 0.15em;
+    text-decoration-thickness: 0.08em;
+  }
+
+  .btn,
+  button,
+  input[type='submit'],
+  input[type='button'],
+  input[type='reset'],
+  .wp-element-button {
+    min-height: 44px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .entry-content table,
+  .page-content table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  pre,
+  code {
+    font-size: 1.2rem;
+  }
+
+  pre {
+    padding: 0.75rem;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  [style*='width:'] {
+    max-width: 100%;
+  }
+
+  .glandore-header {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .g-shell {
+    width: 100%;
+  }
+
+  .g-shell__inner {
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .landing-background {
+    display: none;
+  }
+
+  .home-mobile-intro {
+    display: block;
+    padding: 1rem 1rem 1.5rem;
+  }
+
+  .home-mobile-intro ul {
+    margin: 0 0 1rem;
+    padding-left: 1.2rem;
+  }
+
+  .home-mobile-intro__cta {
+    margin-top: 1rem;
+  }
+
+  .home-mobile-intro__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 10px 14px;
+    text-decoration: none;
+  }
+
+  .home-mobile-intro__note {
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+  }
+
+  /* Canonical mobile header */
+  .header-desktop {
+    display: none !important;
+  }
+
+  .header-mobile {
+    display: block !important;
+    padding: 0.3rem 0.75rem 0.25rem;
+  }
+
+  .header-mobile-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .header-mobile-logo img {
+    max-height: 50px;
+    width: auto;
+    height: auto;
+    padding-right: 0.4rem;
+  }
+
+  .header-mobile-auth a {
+    white-space: nowrap;
+    font-size: 0.95rem;
+  }
+
+  /* Dedicated mobile-service header */
+  .g-mobile-header {
+    display: block;
+    padding: 0.3rem 0.75rem 0.25rem;
+  }
+
+  .g-mobile-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .g-mobile-header__logo img {
+    max-height: 50px;
+    width: auto;
+    height: auto;
+    padding-right: 0.4rem;
+  }
+
+  .g-mobile-header__auth a {
+    white-space: nowrap;
+    font-size: 1rem;
+  }
+
+  .admin-bar .g-mobile-header {
+    margin-top: 60px;
+  }
+
+  .footer-desktop {
+    display: none !important;
+  }
+
+  .footer-mobile {
+    display: block !important;
+    padding: 0.3rem 1rem 0.5rem;
+    text-align: center;
+    font-size: 1.2rem;
+  }
+
+  .footer-mobile p {
+    margin: 0.25rem 0;
+  }
+
+  body.page-template-template-home-mobile main.g-mobile-home {
+    max-width: 480px;
+    margin: 0.4rem auto 0.5rem;
+    padding: 0 1rem;
+  }
+
+  .g-mobile-home__intro p {
+    font-size: 1.2rem;
+    line-height: 1.5;
+    margin: 0 0 0.85rem;
+  }
+
+  .g-mobile-home__intro p:last-child {
+    margin-bottom: 0;
+  }
+
+  .g-mobile-home__inner {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .g-mobile-home__intro p:first-child {
+    margin-top: 0;
+  }
+
+  .g-mobile-home__cta {
+    margin-top: 1.1rem;
+  }
+
+  .g-mobile-home__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 9px 14px;
+    text-decoration: none;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+  }
+
+  .g-mobile-home__note {
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+  }
+
+  body.g-mobile-home-page {
+    background: #ffffff;
+  }
+
+  .g-mobile-home__nav ul {
+    list-style: none;
+    margin: 0.4rem 0;
+    padding-left: 0;
+  }
+
+  .g-mobile-home__nav li {
+    position: relative;
+    margin: 0.15rem 0;
+    padding-left: 1.1rem;
+    font-size: 1.2rem;
+    line-height: 1.3;
+  }
+
+  .g-mobile-home__nav li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.4em;
+    width: 0.4rem;
+    height: 0.4rem;
+    background: #2566cc;
+    transform: rotate(45deg);
+  }
+
+  .g-mobile-home__nav a,
+  .g-mobile-home__nav .g-mobile-home__nav-label {
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  .split-layout {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    padding-top: var(--space-16, 1.5rem);
+    padding-bottom: var(--space-24, 2rem);
+  }
+
+  .split-layout .page-split {
+    display: block;
+    grid-template-columns: none;
+    gap: 0;
+    align-items: stretch;
+    position: static;
+  }
+
+  .split-layout .page-split::before {
+    content: none;
+  }
+
+  .split-layout .page-split-left {
+    position: static;
+    height: auto;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .split-layout .page-split-right {
+    position: static;
+    top: auto;
+    height: auto;
+    padding-left: 0;
+    padding-top: 1.25rem;
+    margin-top: 1.25rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+    z-index: auto;
+  }
+
+  .split-layout .page-split-right h3,
+  .split-layout .page-split-right h4 {
+    color: var(--tychevia-blue);
+    margin-top: 0;
+  }
+
+  body:not(.g-mobile-home-page) .header-mobile + .site-main,
+  body:not(.g-mobile-home-page) .header-mobile + main {
+    margin-top: 0.25rem !important;
+    padding-top: 0 !important;
+  }
+}

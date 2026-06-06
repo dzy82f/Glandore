@@ -1,0 +1,7 @@
+/* Base content font for TinyMCE editors (admin + front-end wp_editor) */
+body#tinymce,
+.mce-content-body {
+  font-family: "Fira Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}

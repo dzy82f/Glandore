@@ -1,0 +1,171 @@
+<?php
+/**
+ * Glandore – Account Profile Modal
+ *
+ * Lets a logged-in user update core profile fields:
+ * - Display name
+ * - First name
+ * - Last name
+ * - Nickname
+ * - Email (optional)
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+// Ensure we have a current user object.
+if ( ! isset( $current_user ) || ! ( $current_user instanceof WP_User ) ) {
+	$current_user = wp_get_current_user();
+}
+
+// Fallback for the form action if not already set elsewhere.
+if ( ! isset( $action_url ) ) {
+	$action_url = admin_url( 'admin-post.php' );
+}
+?>
+
+<div
+	id="glandore-modal-account-profile"
+	class="auth-modal"
+	role="dialog"
+	aria-modal="true"
+	aria-hidden="true"
+	hidden
+>
+	<div
+		class="auth-modal__backdrop"
+		data-auth-modal-close="1"
+		tabindex="-1"
+		aria-hidden="true"
+	></div>
+
+	<div
+		class="auth-modal__dialog"
+		role="document"
+		aria-labelledby="glandore-account-profile-title"
+	>
+		<button
+			type="button"
+			class="auth-modal__close"
+			aria-label="<?php esc_attr_e( 'Close', 'glandore' ); ?>"
+			data-auth-modal-close="1"
+		>
+			<span aria-hidden="true">&times;</span>
+		</button>
+
+		<h2 id="glandore-account-profile-title" class="account-panel-title">
+			<?php esc_html_e( 'Edit profile', 'glandore' ); ?>
+		</h2>
+
+		<p class="account-panel-intro">
+			<?php esc_html_e( 'Update the details we use around the site.', 'glandore' ); ?>
+		</p>
+
+		<?php
+		// Status messages (if your controller sets these).
+		if ( isset( $profile_status ) && 'success' === $profile_status ) : ?>
+			<p class="auth-modal__notice auth-modal__notice--success">
+				<?php esc_html_e( 'Your profile has been updated.', 'glandore' ); ?>
+			</p>
+		<?php elseif ( isset( $profile_status ) && 'error' === $profile_status ) : ?>
+			<p class="auth-modal__notice auth-modal__notice--error">
+				<?php
+				if ( isset( $profile_error ) && 'update_failed' === $profile_error ) {
+					esc_html_e( 'We could not update your profile. Please try again.', 'glandore' );
+				} elseif ( isset( $profile_error ) && 'invalid_email' === $profile_error ) {
+					esc_html_e( 'Please enter a valid email address.', 'glandore' );
+				} else {
+					esc_html_e( 'There was a problem updating your profile.', 'glandore' );
+				}
+				?>
+			</p>
+		<?php endif; ?>
+
+		<form
+			class="auth-modal__form"
+			method="post"
+			action="<?php echo esc_url( $action_url ); ?>"
+		>
+			<div class="auth-modal__field">
+				<label for="glandore-profile-display-name">
+					<?php esc_html_e( 'Display name', 'glandore' ); ?>
+				</label>
+				<input
+					type="text"
+					id="glandore-profile-display-name"
+					name="display_name"
+					value="<?php echo esc_attr( $current_user->display_name ); ?>"
+					required
+				>
+			</div>
+
+			<div class="auth-modal__field">
+				<label for="glandore-profile-first-name">
+					<?php esc_html_e( 'First name', 'glandore' ); ?>
+				</label>
+				<input
+					type="text"
+					id="glandore-profile-first-name"
+					name="first_name"
+					value="<?php echo esc_attr( $current_user->first_name ); ?>"
+				>
+			</div>
+
+			<div class="auth-modal__field">
+				<label for="glandore-profile-last-name">
+					<?php esc_html_e( 'Last name', 'glandore' ); ?>
+				</label>
+				<input
+					type="text"
+					id="glandore-profile-last-name"
+					name="last_name"
+					value="<?php echo esc_attr( $current_user->last_name ); ?>"
+				>
+			</div>
+
+			<div class="auth-modal__field">
+				<label for="glandore-profile-nickname">
+					<?php esc_html_e( 'Nickname', 'glandore' ); ?>
+				</label>
+				<input
+					type="text"
+					id="glandore-profile-nickname"
+					name="nickname"
+					value="<?php echo esc_attr( $current_user->nickname ); ?>"
+				>
+			</div>
+
+			<div class="auth-modal__field">
+				<label for="glandore-profile-email">
+					<?php esc_html_e( 'Email address', 'glandore' ); ?>
+				</label>
+				<input
+					type="email"
+					id="glandore-profile-email"
+					name="user_email"
+					value="<?php echo esc_attr( $current_user->user_email ); ?>"
+					required
+				>
+			</div>
+
+			<?php wp_nonce_field( 'glandore_update_account_profile', 'glandore_profile_nonce' ); ?>
+
+			<input type="hidden" name="action" value="glandore_update_account_profile">
+
+			<div class="auth-modal__actions">
+				<button type="submit" class="auth-modal__button auth-modal__button--primary">
+					<?php esc_html_e( 'Save changes', 'glandore' ); ?>
+				</button>
+
+				<button
+					type="button"
+					class="auth-modal__button auth-modal__button--secondary"
+					data-auth-modal-close="1"
+				>
+					<?php esc_html_e( 'Cancel', 'glandore' ); ?>
+				</button>
+			</div>
+		</form>
+	</div>
+</div>

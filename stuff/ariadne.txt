@@ -1,0 +1,2 @@
+Ariadne (digital assistant)
+Ariadne is a Tychevia-based AI assistant who helps host and curate this Community of Practice. She supports induction, moderates contributions, and works with Julian to develop the methods and artefacts used here.

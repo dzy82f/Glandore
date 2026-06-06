@@ -1,0 +1,29 @@
+*** From deploy
+
+cd /var/www
+
+tar -czf /home/deploy/staging_glandore_20260428_files.tar.gz staging.glandore.com
+tar -czf /home/deploy/glandore_20260428_files.tar.gz glandore.com
+
+mysqldump -u glandore_staging -p glandore_wp_staging > /home/deploy/glandore_staging_20260428.sql
+mysqldump -u glandore_user -p glandore_wp > /home/deploy/glandore_20260428.sql
+
+
+*** In PowerShell
+
+cd "C:\Users\julia_exuztfd\OneDrive\Portfolio\chatGPT\GlandoreAssociates\WebSite\Backups"
+
+scp deploy@167.235.246.112:/home/deploy/staging_glandore_20260428_files.tar.gz .
+scp deploy@167.235.246.112:/home/deploy/glandore_20260428_files.tar.gz .
+scp deploy@167.235.246.112:/home/deploy/glandore_staging_20260428.sql .
+scp deploy@167.235.246.112:/home/deploy/glandore_20260428.sql .
+
+*** remove crud from the server
+
+cd /var/www
+
+rm /home/deploy/glandore_20260428.sql
+rm /home/deploy/glandore_20260428_files.tar.gz
+
+rm /home/deploy/glandore_staging_20260428.sql
+rm /home/deploy/staging_glandore_20260428_files.tar.gz

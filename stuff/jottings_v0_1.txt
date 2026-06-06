@@ -1,0 +1,391 @@
+cd /var/www/staging.glandore.com/public
+/var/www/staging.glandorecd /var/www/staging.glandore.com/public/wp-content/themes/glandore/db.com/public/themes/glandore/db
+cd /var/www/glandore.com/public
+
+
+wp user get sheila@k2pmr.com --field=ID
+wp user meta list xxx
+wp user meta update xxx glandore_show_completion_modal 1
+
+wp user meta get 320 glandore_registration_status
+wp user meta get 320 glandore_show_completion_modal
+wp user meta get 320 ur_confirm_email
+wp user meta get 320 ur_user_status
+
+wp user meta update 350 glandore_show_completion_modal 1
+wp user meta delete 350 session_tokens
+wp user meta delete 350 glandore_profile_complete
+
+wp user meta delete 350 glandore_profile_data
+
+*** staging backup
+
+cd /var/www
+tar -czf /home/deploy/staging_glandore_20260404_files.tar.gz staging.glandore.com
+
+In ps
+
+cd "C:\Users\julia_exuztfd\OneDrive\Portfolio\chatGPT\GlandoreAssociates\WebSite\Backups"
+scp deploy@167.235.246.112:/home/deploy/staging_glandore_20260330_files.tar.gz .
+
+*** Prod backup
+
+cd /var/www
+tar -czf /home/deploy/glandore_20260330_files.tar.gz glandore.com
+
+In ps
+
+cd "C:\Users\julia_exuztfd\OneDrive\Portfolio\chatGPT\GlandoreAssociates\WebSite\Backups"
+
+scp deploy@167.235.246.112:/home/deploy/glandore_20260330_files.tar.gz .
+
+*** db backup
+
+*** on staging
+tar -czf /home/deploy/glandore_staging_20260330.tar.gz \
+/var/www/staging.glandore.com
+
+cd "C:\Users\julia_exuztfd\OneDrive\Portfolio\chatGPT\GlandoreAssociates\WebSite\Backups"
+
+scp deploy@167.235.246.112:/home/deploy/glandore_wp_staging_2026-03-30_123031.sql .
+
+*** on prod
+
+tar -czf /home/deploy/glandore_prod_20260330.tar.gz \
+/var/www/glandore.com
+
+cd "C:\Users\julia_exuztfd\OneDrive\Portfolio\chatGPT\GlandoreAssociates\WebSite\Backups"
+
+scp deploy@167.235.246.112:/home/deploy/glandore_wp_prod_2026-03-30_123031.sql .
+
+** This may be better
+
+mysqldump -u 'glandore_staging' -p 'glandore_wp_staging' > /home/deploy/glandore_staging_20260331.sql
+mysqldump -u 'glandore_user' -p 'glandore_wp' > /home/deploy/glandore_20260331.sql
+
+scp deploy@167.235.246.112:/home/deploy/glandore_staging_20260330.sql .
+
+wp db export /home/deploy/glandore_prod_pre_promotion.sql \
+--path=/var/www/glandore.com
+
+Delete backup folder
+
+Remove-Item -LiteralPath "C:\Users\julia_exuztfd\OneDrive\Portfolio\chatGPT\GlandoreAssociates\WebSite\Backups\staging.glandore.com" -Recurse -Force
+
+
+Ctrl+F2 or clicked in the left margin, which toggles a bookmark on that line.
+cycle through bookmarks with F2 / Shift+F2.
+
+Hold Alt + drag with the mouse → lets you edit a vertical block (great for lining up multiple font-weight, color, etc.).
+
+https://staging.glandore.com/wp-content/uploads/2025/11/Stellantis_v0.2.pdf
+
+deploy@Glandore:~$ grep -E "DB_NAME|DB_USER|DB_PASSWORD|DB_HOST" /var/www/staging.glandore.com/public/wp-config.php
+define( 'DB_NAME', 'glandore_wp' );
+define( 'DB_USER', 'glandore_user' );
+define( 'DB_PASSWORD', '@TheL0rdIsMyShepherd' );
+define( 'DB_HOST', 'localhost' );
+deploy@Glandore:~$
+
+<option value="Oil &amp Gas">Oil &amp Gas</option>
+<option value="Sustainability">Sustainability</option>
+
+<option value="Oil &amp Gas" <?php selected( $industry, 'Oil &amp Gas' ); ?>>Oil &amp Gas</option>
+<option value="Sustainability">Sustainability <?php selected( $industry, 'Sustainability' ); ?>>Sustainability</option>
+
+https://glandore.com/
+
+sudo cp \
+  /var/www/staging.glandore.com/public/wp-content/mu-plugins/glandore-disable-completion-modal.php \
+  /var/www/glandore.com/public/wp-content/mu-plugins/
+
+wp user meta delete 235 glandore_cop_about_complete
+
+cd C:\Tools\plantuml
+
+java -jar .\plantuml.jar -tpng .\LO2_CoP_MVS_Browser_v0_2.puml
+java -jar .\plantuml.jar -tpng .\LO2_CoP_MVS_Context_v0_2.puml
+java -jar .\plantuml.jar -tpng .\LO2_CoP_MVS_Domain_v0_2.puml
+java -jar .\plantuml.jar -tpng .\LO2_CoP_MVS_Flow_v0_2.puml
+
+java -jar .\plantuml.jar -tpng .\cop-induction-bio-flow.puml
+
+java -jar .\plantuml.jar -tpng "C:\Users\julia_exuztfd\OneDrive\God's Ledger\outline_v0.1.puml"
+java -jar .\plantuml.jar -tpng "C:\Users\julia_exuztfd\OneDrive\God's Ledger\gl_2.puml"
+
+java -jar .\plantuml.jar -tpng "C:\Users\julia_exuztfd\OneDrive\Portfolio\chatGPT\Tychevia 2.0\Community of Practice\cop_sequence_v0_1.puml"
+
+java -jar .\plantuml.jar -tpng "C:\Users\julia_exuztfd\OneDrive\Portfolio\chatGPT\GlandoreAssociates\WebSite\.puml\schema_1.puml"
+
+wp db query "
+DELETE FROM wp_usermeta
+WHERE user_id = 235
+  AND (
+    meta_key LIKE 'cop_%'
+    OR meta_key LIKE 'glandore_cop_%'
+  );
+"
+
+Financials,
+Basic Materials,
+Energy,
+Consumer Defensive,
+Consumer Cyclical,
+Telecoms,
+Utilities,
+Healthcare,
+Industrials
+Technology.
+
+# 0) Go to the WP root on staging
+cd /var/www/staging.glandore.com/public
+
+# 1) List most recent posts (all types) / filter to CoP posts
+wp post list --orderby=date --order=DESC --posts_per_page=20 --fields=ID,post_type,post_status,post_date,post_title
+wp post list --post_type=cop_post --orderby=date --order=DESC --posts_per_page=20 --fields=ID,post_status,post_date,post_title
+
+# 2) List registered post types (sanity check)
+wp post-type list
+
+# 3) Find posts created in the last 60 minutes (authoritative, DB-level)
+wp db query "
+SELECT ID, post_type, post_status, post_date, post_date_gmt, post_title
+FROM wp_posts
+WHERE post_date_gmt >= (UTC_TIMESTAMP() - INTERVAL 60 MINUTE)
+ORDER BY post_date_gmt DESC
+LIMIT 50;
+"
+
+# 4) Check autosaves/revisions created in the last 60 minutes
+wp db query "
+SELECT ID, post_type, post_status, post_date, post_title, post_parent
+FROM wp_posts
+WHERE post_type IN ('revision','auto-draft')
+AND post_date_gmt >= (UTC_TIMESTAMP() - INTERVAL 60 MINUTE)
+ORDER BY post_date_gmt DESC
+LIMIT 50;
+"
+
+# 5) Search posts by title substring (any type/status)
+wp post list --post_status=any --post_type=any --search="Some words" \
+  --fields=ID,post_type,post_status,post_date,post_title --orderby=date --order=DESC --posts_per_page=50
+
+# 6) List users (to get author IDs), then filter posts by author
+wp user list --fields=ID,user_login,display_name
+wp post list --post_status=any --post_type=any --author=<USER_ID> \
+  --fields=ID,post_type,post_status,post_date,post_title --orderby=date --order=DESC --posts_per_page=50
+
+# 7) Dump a single post (human and JSON)
+wp post get <ID>
+wp post get <ID> --format=json
+
+# 8) Pull core fields (including content) for a post
+wp post get <ID> --fields=ID,post_type,post_status,post_title,post_author,post_parent,post_date,post_content,post_excerpt
+
+# 9) List post meta / get a specific meta key
+wp post meta list <ID>
+wp post meta get <ID> <meta_key>
+
+# 10) DB-level view of the post row + its meta keys (preview)
+wp db query "SELECT ID, post_type, post_status, post_date, post_title, post_parent, post_author FROM wp_posts WHERE ID=<ID>\G"
+wp db query "SELECT meta_key, LEFT(meta_value,200) AS meta_value_preview FROM wp_postmeta WHERE post_id=<ID> ORDER BY meta_key;"
+
+# 11) Check parent/child relationships
+wp post get <ID> --field=post_parent
+wp post list --post_parent=<ID> --post_status=any --post_type=any --fields=ID,post_type,post_status,post_date,post_title
+
+# 12) List taxonomies attached to a post type (proved cop_thread is a taxonomy)
+wp eval 'print_r( get_object_taxonomies("cop_post") );'
+
+# 13) List terms assigned to a post (topic/thread)
+wp post term list <ID> cop_topic
+wp post term list <ID> cop_thread
+
+# 14) List all terms for the CoP taxonomies (with usage counts)
+wp term list cop_topic --fields=term_id,slug,name,count
+wp term list cop_thread --fields=term_id,slug,name,count
+
+# 15) Dump taxonomy registration arrays (show_ui, hierarchical, etc.)
+wp eval '
+global $wp_taxonomies;
+print_r( $wp_taxonomies["cop_topic"] ?? "cop_topic not registered" );
+print_r( $wp_taxonomies["cop_thread"] ?? "cop_thread not registered" );
+'
+
+# 16) Show all terms attached to a post (any taxonomy) via SQL
+wp db query "
+SELECT tt.taxonomy, t.slug, t.name
+FROM wp_term_relationships tr
+JOIN wp_term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+JOIN wp_terms t ON tt.term_id = t.term_id
+WHERE tr.object_id = <ID>
+ORDER BY tt.taxonomy, t.name;
+"
+
+# 17) Find anything created around a timestamp window (useful for “paired” records)
+wp db query "
+SELECT ID, post_type, post_status, post_date_gmt, post_title, post_parent
+FROM wp_posts
+WHERE post_date_gmt BETWEEN 'YYYY-MM-DD HH:MM:SS' AND 'YYYY-MM-DD HH:MM:SS'
+ORDER BY post_date_gmt DESC;
+"
+
+# 18) Scan for CoP meta keys across recent items
+wp db query "
+SELECT post_id, meta_key, LEFT(meta_value,120) AS v
+FROM wp_postmeta
+WHERE meta_key LIKE 'cop_%'
+ORDER BY post_id DESC, meta_key
+LIMIT 200;
+"
+
+# 19) Assign / create thread terms manually (workaround)
+wp post term add <ID> cop_thread <thread-slug-or-term>
+wp term create cop_thread "Thread name"
+wp post term add <ID> cop_thread "Thread name"
+
+# 20) Grep the codebase to find where cop_thread is set (theme + mu-plugins + plugins)
+grep -RIn --exclude-dir=node_modules --exclude-dir=vendor --exclude=*.min.js \
+  -E "cop_thread|wp_set_object_terms|wp_set_post_terms|tax_input" \
+  wp-content/themes/glandore wp-content/mu-plugins wp-content/plugins | head -n 80
+
+Delete Posts
+  
+# Go to WP root
+cd /var/www/staging.glandore.com/public
+
+# 1) Delete a single post (force = bypass trash)
+wp post delete <ID> --force
+
+# 2) Delete all CoP posts (cop_post) — DANGEROUS
+wp post list --post_type=cop_post --format=ids | xargs -r wp post delete --force
+
+# 3) Delete ALL posts of a given type created in last 60 minutes (surgical)
+wp db query "
+SELECT ID FROM wp_posts
+WHERE post_type='cop_post'
+AND post_date_gmt >= (UTC_TIMESTAMP() - INTERVAL 60 MINUTE);
+" --skip-column-names | xargs -r wp post delete --force
+
+# 4) Delete orphaned revisions/autodrafts in last 60 minutes
+wp db query "
+SELECT ID FROM wp_posts
+WHERE post_type IN ('revision','auto-draft')
+AND post_date_gmt >= (UTC_TIMESTAMP() - INTERVAL 60 MINUTE);
+" --skip-column-names | xargs -r wp post delete --force
+
+# 5) Delete a taxonomy term (topic/thread) by ID (reassigns relationships away)
+wp term delete cop_topic <TERM_ID>
+wp term delete cop_thread <TERM_ID>
+
+# 6) Delete ALL thread terms (cop_thread) — leaves posts but removes thread grouping
+wp term list cop_thread --format=ids | xargs -r wp term delete cop_thread
+
+# 7) Delete ALL topic terms (cop_topic) — leaves posts but removes topic grouping
+wp term list cop_topic --format=ids | xargs -r wp term delete cop_topic
+
+# 8) Remove a term from a single post (unassign)
+wp post term remove <POST_ID> cop_topic <term-slug-or-name>
+wp post term remove <POST_ID> cop_thread <term-slug-or-name>
+
+CoP SQL
+
+cd /var/www/staging.glandore.com/public
+
+wp db query "SHOW CREATE TABLE wp_cop_threads\G"
+
+wp db query "
+  SELECT id, slug, title, created_by, created_at, status
+  FROM wp_cop_threads
+  ORDER BY id
+  \G"
+  
+wp db query "SHOW CREATE TABLE wp_cop_contributions\G"  
+  
+wp db query "
+  SELECT id, thread_id, user_id, title, content, created_at, status
+  FROM wp_cop_contributions
+  ORDER BY id
+  \G"
+
+wp db query "DELETE FROM wp_cop_threads WHERE id IN (1, 2);"
+
+wp db query "SHOW CREATE TABLE wp_cop_snapshots\G"
+
+wp db query "
+  SELECT *
+  FROM wp_cop_snapshots
+  ORDER BY id
+  \G"
+
+wp db query "
+  SET FOREIGN_KEY_CHECKS = 0;
+  TRUNCATE TABLE wp_cop_contributor;
+  TRUNCATE TABLE wp_cop_threads;
+  TRUNCATE TABLE wp_cop_contributions;
+  TRUNCATE TABLE wp_cop_snapshots;
+  SET FOREIGN_KEY_CHECKS = 1;
+" 
+
+*** CoP contributions
+
+wp_cop_contributions
+
+ *** Example
+ 
+wp db query "
+SELECT id, thread_id, title
+FROM wp_cop_contributions
+WHERE title = 'Are We Moving from the Information Age to the Imagination Age?'
+   OR content LIKE '%Are We Moving from the Information Age to the Imagination Age?%';
+" --table
+
+(thread_id = 5)
+
+wp db query "
+SELECT * FROM wp_cop_threads WHERE id = 5;
+SELECT id, thread_id, title, visibility, created_at FROM wp_cop_contributions WHERE thread_id = THREAD_ID ORDER BY id;
+SELECT id, thread_id, version, created_at FROM wp_cop_snapshots WHERE thread_id = THREAD_ID ORDER BY id;
+" --table
+
+delete
+
+wp db query "
+START TRANSACTION;
+
+DELETE FROM wp_cop_snapshots
+WHERE thread_id = 5;
+
+DELETE FROM wp_cop_contributions
+WHERE thread_id = 5;
+
+DELETE FROM wp_cop_threads
+WHERE id = 5;
+
+COMMIT;
+"
+
+mysql -uglandore_user -p -h localhost glandore_wp
+
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHPDJpfIKJDqayhI++iGVD3CXANQ+/XEqPqr5HJNTuYU julian@glandore.com
+
+mysqldump -u glandore_user -p @TheL0rdIsMyShepherd glandore_wp wp_cop_threads wp_cop_contributions wp_cop_snapshots > /root/cop.sql
+
+// ** Database settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define( 'DB_NAME', 'glandore_wp' );
+/** Database username */
+define( 'DB_USER', 'glandore_user' );
+/** Database password */
+define( 'DB_PASSWORD', '@TheL0rdIsMyShepherd' );
+/** Database hostname */
+define( 'DB_HOST', 'localhost' );
+/** Database charset to use in creating database tables. */
+define( 'DB_CHARSET', 'utf8' );
+/** The database collate type. Don't change this if in doubt. */
+define( 'DB_COLLATE', '' );
+
+mysqldump -u glandore_user -p glandore_wp wp_cop_threads wp_cop_contributions wp_cop_snapshots > ~/cop_tables_live_backup.sql
+mysql -u glandore_user -p glandore_wp < ~/cop_tables.sql
+
+scp "C:\Users\julia_exuztfd\OneDrive\Portfolio\chatGPT\Tychevia 2.0\Community of Practice\Structure\recovered\wp_usermeta_missing_only.sql" deploy@167.235.246.112:~

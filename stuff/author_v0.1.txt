@@ -1,0 +1,11 @@
+This novel is based on a method for thinking with, rather than through, artificial intelligence called Tychevia\textsuperscript{\textregistered}.
+
+It makes extensive use of "Digital Associates" - \emph{distinct epistemic identities}. These are analytical collaborators within the Knowledge Engine.
+
+They interpret evidence, surface patterns and contribute to the
+evolution of the system itself.
+
+Associates operate as reflective participants,
+able to reason across domains, trace feedback loops and refine artefacts through
+dialogue.  Their role is interpretive rather than procedural — they extend human
+judgement rather than replace it.

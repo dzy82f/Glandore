@@ -1,0 +1,141 @@
+/* ===============================
+   Account modals – shared styling
+   Applies to:
+   - #glandore-account-modal
+   - #glandore-modal-account-profile
+   - #glandore-modal-lost-password
+
+   NOTE:
+   Layout (backdrop, positioning, card size, scrolling) is handled
+   by the global .auth-modal / .auth-modal__dialog rules used by
+   the registration modals. This block ONLY styles typography,
+   avatar, and action list.
+   =============================== */
+
+/* Panel title */
+.account-panel-title {
+  margin: 0 0 10px 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--tychevia-blue);
+}
+
+/* Left-aligned body so bullets line up correctly */
+.account-panel-body {
+  font-size: 14px;
+  color: #111;
+  text-align: left;
+}
+
+/* Welcome centred */
+.account-panel-welcome {
+  margin: 8px 0 10px 0;
+  text-align: center;
+}
+
+/* Circular avatar */
+.account-panel-avatar {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: #eee;
+  margin: 10px auto 14px auto;
+}
+
+/* Intro text above the list */
+.account-panel-intro {
+  margin: 10px 0 10px 0;
+}
+
+/* Normal bullets; kill any global diamond bullets */
+.account-panel-actions {
+  margin: 10px 0 0 0;
+  padding-left: 18px;
+  list-style-type: disc;
+  list-style-position: outside;
+}
+
+.account-panel-actions li::before {
+  content: none !important;
+}
+
+.account-panel-actions li {
+  margin: 6px 0;
+}
+
+/* Links inside the list */
+.account-panel-actions a {
+  color: #111;
+  text-decoration: none;
+}
+
+.account-panel-actions a:hover {
+  text-decoration: underline;
+}
+
+/* Optional CTA under the list */
+.account-panel-actions-cta {
+  margin: 12px 0 0 0;
+}
+
+.account-panel-primary {
+  display: inline-block;
+  padding: 10px 12px;
+  border: 2px solid #111;
+  text-decoration: none;
+  color: #111;
+}
+
+/* Simple notice / status text */
+.glandore-account-loading,
+.glandore-account-error {
+  font-size: 14px;
+  padding: 10px 0;
+}
+
+/* ============================================
+   Account + Delete modals – field styling
+   Match "Update your profile" / Fluent Forms look
+   Applies to:
+   - #glandore-modal-account-profile
+   - #glandore-modal-lost-password
+   - #glandore-modal-delete-account
+   ============================================ */
+
+/* Forms: remove extra margins if any */
+#glandore-modal-account-profile .auth-modal__form,
+#glandore-modal-lost-password .auth-modal__form,
+#glandore-modal-delete-account .auth-modal__form {
+  margin: 0;
+}
+
+/* Individual fields */
+#glandore-modal-account-profile .auth-modal__field,
+#glandore-modal-lost-password .auth-modal__field,
+#glandore-modal-delete-account .auth-modal__field {
+  margin-bottom: 1rem;
+}
+
+/* Labels – same style as Fluent Forms / profile form */
+#glandore-modal-account-profile .auth-modal__field label,
+#glandore-modal-lost-password .auth-modal__field label,
+#glandore-modal-delete-account .auth-modal__field label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+/* Inputs / selects / textareas – full width, same chrome */
+#glandore-modal-account-profile .auth-modal__input,
+#glandore-modal-lost-password .auth-modal__input,
+#glandore-modal-delete-account .auth-modal__input {
+  width: 100%;
+  box-sizing: border-box;
+  /* rely on your existing input padding/border/radius vars */
+}
+
+
+
+
+
+

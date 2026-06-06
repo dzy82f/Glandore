@@ -1,0 +1,110 @@
+<?php
+/**
+ * Glandore – Lost Password Modal
+ *
+ * Front-end lost password request.
+ * Uses WordPress core retrieve_password() and email/reset flow.
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+// Defaults in case the glue file has not set them yet.
+if ( ! isset( $action_url ) ) {
+	$action_url = home_url( '/account/' );
+}
+
+$lost_status = isset( $lost_status ) ? $lost_status : '';
+$lost_error  = isset( $lost_error )  ? $lost_error  : '';
+?>
+<div
+	id="glandore-modal-lost-password"
+	class="auth-modal"
+	role="dialog"
+	aria-modal="true"
+	aria-hidden="true"
+	hidden
+>
+	<div
+		class="auth-modal__backdrop"
+		data-auth-modal-close="1"
+		tabindex="-1"
+		aria-hidden="true"
+	></div>
+
+	<div
+		class="auth-modal__dialog"
+		role="document"
+		aria-labelledby="glandore-lost-password-title"
+	>
+		<button
+			type="button"
+			class="auth-modal__close"
+			aria-label="<?php esc_attr_e( 'Close', 'glandore' ); ?>"
+			data-auth-modal-close="1"
+		>
+			<span aria-hidden="true">&times;</span>
+		</button>
+
+		<h2 id="glandore-lost-password-title" class="account-panel-title">
+			<?php esc_html_e( 'Reset password', 'glandore' ); ?>
+		</h2>
+
+		<p class="account-panel-intro">
+			<?php esc_html_e( 'Enter your username or email address and we will send you a reset link.', 'glandore' ); ?>
+		</p>
+
+		<?php if ( 'success' === $lost_status ) : ?>
+			<p class="auth-modal__notice auth-modal__notice--success">
+				<?php esc_html_e( 'If an account exists with that detail, a reset link has been emailed.', 'glandore' ); ?>
+			</p>
+		<?php elseif ( 'error' === $lost_status ) : ?>
+			<p class="auth-modal__notice auth-modal__notice--error">
+				<?php
+				if ( 'empty' === $lost_error ) {
+					esc_html_e( 'Please enter your username or email address.', 'glandore' );
+				} else {
+					esc_html_e( 'We could not process that request. Please check your details and try again.', 'glandore' );
+				}
+				?>
+			</p>
+		<?php endif; ?>
+
+		<form
+			class="auth-modal__form"
+			method="post"
+			action="<?php echo esc_url( $action_url ); ?>"
+		>
+			<div class="auth-modal__field">
+				<label for="glandore-lost-user-login">
+					<?php esc_html_e( 'Username or email', 'glandore' ); ?>
+				</label>
+				<input
+					type="text"
+					id="glandore-lost-user-login"
+					name="user_login"
+					required
+				>
+			</div>
+
+			<?php wp_nonce_field( 'glandore_lost_password_request', 'glandore_lost_password_nonce' ); ?>
+
+			<input type="hidden" name="action" value="glandore_lost_password_request">
+
+			<div class="auth-modal__actions">
+				<button type="submit" class="auth-modal__button auth-modal__button--primary">
+					<?php esc_html_e( 'Send reset link', 'glandore' ); ?>
+				</button>
+
+				<button
+					type="button"
+					class="auth-modal__button auth-modal__button--secondary"
+					data-auth-modal-close="1"
+				>
+					<?php esc_html_e( 'Cancel', 'glandore' ); ?>
+				</button>
+			</div>
+		</form>
+	</div>
+</div>
