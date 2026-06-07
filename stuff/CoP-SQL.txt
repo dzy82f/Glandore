@@ -1,0 +1,111 @@
+cd /var/www/staging.glandore.com/public
+
+wp db query "
+	SELECT * FROM wp_cop_threads
+	ORDER BY id DESC;"
+	
+wp db query "
+	DESCRIBE wp_cop_contributions;"	
+	
+wp db query "
+	SELECT * FROM wp_cop_contributions
+	WHERE thread_id = 2
+	ORDER BY id ASC;"
+	
+wp db query "
+	DESCRIBE wp_cop_snapshot_sources;"	
+
+wp db query "
+	SELECT * FROM wp_cop_snapshot_sources;"
+
+wp db query "
+	DESCRIBE wp_cop_snapshots;"
+
+wp db query "
+	SELECT * FROM wp_cop_snapshots;"
+
+wp db query "
+	SELECT * FROM wp_cop_snapshots
+	WHERE thread_id = 2
+	ORDER BY version DESC,
+	id DESC LIMIT 1;"
+
+wp db query "
+	START TRANSACTION;
+	DELETE ss FROM wp_cop_snapshot_sources ss
+	JOIN wp_cop_snapshots s ON s.id = ss.snapshot_id
+	WHERE s.thread_id = 2;
+	DELETE FROM wp_cop_snapshots WHERE thread_id = 2;
+	DELETE FROM wp_cop_contributions WHERE thread_id = 2;
+	DELETE FROM wp_cop_threads WHERE id = 2;
+	COMMIT;"
+
+wp db query "
+	SET FOREIGN_KEY_CHECKS=0;
+	TRUNCATE TABLE wp_cop_snapshot_sources;
+	TRUNCATE TABLE wp_cop_snapshots;
+	TRUNCATE TABLE wp_cop_contributions;
+	TRUNCATE TABLE wp_cop_threads;
+	SET FOREIGN_KEY_CHECKS=1;"
+	
+Delete private messages	
+
+wp db query "
+	SELECT id, thread_id, user_id, recipient_user_id, visibility, created_at
+	FROM wp_cop_contributions
+	WHERE visibility IN ('direct','moderators')
+	ORDER BY created_at DESC, id DESC;"
+
+wp db query "
+	UPDATE wp_cop_contributions
+	SET status='deleted'
+	WHERE visibility IN ('direct','moderators');"
+
+wp db query "
+	SELECT COUNT(*) AS remaining
+	FROM wp_cop_contributions
+	WHERE visibility IN ('direct','moderators') AND status='published';"
+	
+Mobile considerations	
+
+wp db query "
+	SELECT
+  s.id,
+  s.thread_id,
+  s.version,
+  s.created_at,
+
+  /* header: first <h3 …>…</h3> */
+  TRIM(
+    SUBSTRING_INDEX(
+      SUBSTRING_INDEX(s.content, '</h3>', 1),
+      '>',
+      -1
+    )
+  ) AS header,
+
+  /* body: everything after first </h3> */
+  TRIM(
+    SUBSTRING(s.content, LOCATE('</h3>', s.content) + LENGTH('</h3>'))
+  ) AS body
+
+FROM wp_cop_snapshots s
+JOIN (
+  SELECT thread_id, MAX(version) AS max_version
+  FROM wp_cop_snapshots
+  GROUP BY thread_id
+) mv
+  ON mv.thread_id = s.thread_id
+ AND mv.max_version = s.version
+
+/* tie-break if multiple rows share the same (thread_id, version) */
+JOIN (
+  SELECT thread_id, version, MAX(id) AS max_id
+  FROM wp_cop_snapshots
+  GROUP BY thread_id, version
+) mi
+  ON mi.thread_id = s.thread_id
+ AND mi.version   = s.version
+ AND mi.max_id    = s.id
+
+ORDER BY s.thread_id ASC;"

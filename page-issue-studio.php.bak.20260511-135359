@@ -1,0 +1,261 @@
+<?php
+/**
+ * Template Name: Issue Studio
+ * Template Post Type: page
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+global $wpdb;
+
+$classes_table   = $wpdb->prefix . 'sa_classes';
+$issues_table    = $wpdb->prefix . 'sa_issues';
+$lenses_table    = $wpdb->prefix . 'sa_lenses';
+$questions_table = $wpdb->prefix . 'sa_perspective_questions';
+$artefacts_table = $wpdb->prefix . 'sa_artefacts';
+$snapshots_table = $wpdb->prefix . 'sa_artefact_snapshots';
+
+$issue_studio_js = get_stylesheet_directory() . '/assets/js/issue-studio.js';
+
+wp_enqueue_script(
+	'glandore-issue-studio',
+	get_stylesheet_directory_uri() . '/assets/js/issue-studio.js',
+	array(),
+	file_exists( $issue_studio_js ) ? filemtime( $issue_studio_js ) : null,
+	true
+);
+
+$classes = $wpdb->get_results(
+	"SELECT id, class_slug, class_title
+	 FROM {$classes_table}
+	 WHERE status = 'active'
+	 ORDER BY sort_order ASC, class_title ASC"
+) ?: array();
+
+$issues = $wpdb->get_results(
+	"SELECT id, class_id, issue_slug, issue_title
+	 FROM {$issues_table}
+	 WHERE status = 'active'
+	 ORDER BY sort_order ASC, issue_title ASC"
+) ?: array();
+
+$questions = $wpdb->get_results(
+	"SELECT
+		q.id,
+		q.class_id,
+		q.question_text,
+		q.help_text,
+		q.sort_order,
+		l.lens_slug,
+		l.lens_title
+	 FROM {$questions_table} q
+	 INNER JOIN {$lenses_table} l ON q.lens_id = l.id
+	 WHERE q.status = 'active'
+	   AND l.status = 'active'
+	 ORDER BY q.sort_order ASC, l.lens_title ASC"
+) ?: array();
+
+$existing_artefacts = $wpdb->get_results(
+	"
+	SELECT
+		a.id,
+		a.artefact_title,
+		a.issue_description,
+		a.created_at,
+		c.class_title,
+		i.issue_title,
+		s.id AS latest_snapshot_id,
+		s.created_at AS snapshot_created_at
+	FROM {$artefacts_table} a
+	INNER JOIN (
+		SELECT artefact_id, MAX(id) AS latest_snapshot_id
+		FROM {$snapshots_table}
+		GROUP BY artefact_id
+	) latest ON latest.artefact_id = a.id
+	INNER JOIN {$snapshots_table} s ON s.id = latest.latest_snapshot_id
+	LEFT JOIN {$classes_table} c ON c.id = a.class_id
+	LEFT JOIN {$issues_table} i ON i.id = a.issue_id
+	WHERE a.status = 'active'
+	ORDER BY s.created_at DESC, s.id DESC
+	LIMIT 50
+	"
+) ?: array();
+
+get_header();
+?>
+
+<main id="main" class="split-layout">
+
+	<div class="page-split">
+
+		<div class="page-split-left">
+			<section class="page-content">
+				<?php get_template_part( 'template_parts/content', 'issue-studio' ); ?>
+			</section>
+		</div>
+
+		<div class="page-split-right">
+
+			<h4>Existing issues</h4>
+
+			<div class="cop-contribution-field">
+				<label for="sa-existing" class="cop-contribution-label">
+					Select an existing issue
+				</label>
+
+				<select
+					class="cop-contribution-select"
+					id="sa-existing"
+					name="existing_artefact"
+					data-issue-studio-existing
+				>
+					<option value="">Select an existing issue</option>
+
+					<?php foreach ( $existing_artefacts as $artefact ) : ?>
+						<?php
+						$label_parts = array();
+
+						if ( ! empty( $artefact->class_title ) ) {
+							$label_parts[] = trim( $artefact->class_title );
+						}
+
+						if ( ! empty( $artefact->issue_title ) ) {
+							$label_parts[] = trim( $artefact->issue_title );
+						}
+
+						$context = ! empty( $label_parts ) ? implode( ' / ', $label_parts ) . ' — ' : '';
+
+						if ( ! empty( $artefact->artefact_title ) ) {
+							$title = trim( wp_strip_all_tags( (string) $artefact->artefact_title ) );
+						} elseif ( ! empty( $artefact->issue_description ) ) {
+							$title = trim(
+								wp_trim_words(
+									wp_strip_all_tags( (string) $artefact->issue_description ),
+									16,
+									'…'
+								)
+							);
+						} else {
+							$title = 'Untitled issue';
+						}
+
+						$url = add_query_arg(
+							'artefact_id',
+							absint( $artefact->id ),
+							home_url( '/issue-studio-result/' )
+						);
+						?>
+
+						<option value="<?php echo esc_url( $url ); ?>">
+							<?php echo esc_html( $context . $title ); ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+
+			<h4>Start a new Issue</h4>
+
+			<form
+				id="sa-form"
+				data-issue-studio-form
+				method="post"
+				action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
+			>
+				<input type="hidden" name="action" value="glandore_sa_start">
+				<?php wp_nonce_field( 'glandore_sa_start', 'glandore_sa_start_nonce' ); ?>
+
+				<div class="cop-contribution-field">
+					<label for="sa-class" class="cop-contribution-label">
+						Domain
+					</label>
+
+					<select
+						class="cop-contribution-select"
+						id="sa-class"
+						name="class_id"
+						required
+					>
+						<option value="">Select a domain</option>
+
+						<?php foreach ( $classes as $class ) : ?>
+							<option value="<?php echo esc_attr( (string) $class->id ); ?>">
+								<?php echo esc_html( $class->class_title ); ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
+				</div>
+
+				<div class="cop-contribution-field">
+					<label for="sa-issue" class="cop-contribution-label">
+						Issue
+					</label>
+
+					<select
+						class="cop-contribution-select"
+						id="sa-issue"
+						name="issue_id"
+						required
+					>
+						<option value="">Select an issue</option>
+
+						<?php foreach ( $issues as $issue ) : ?>
+							<option
+								value="<?php echo esc_attr( (string) $issue->id ); ?>"
+								data-class-id="<?php echo esc_attr( (string) $issue->class_id ); ?>"
+							>
+								<?php echo esc_html( $issue->issue_title ); ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
+				</div>
+
+				<div
+					class="cop-contribution-field"
+					id="sa-lenses-field"
+					hidden
+				>
+					<span class="cop-contribution-label">
+						Choose how to explore this issue
+					</span>
+
+					<?php foreach ( $questions as $question ) : ?>
+						<label
+							data-issue-studio-perspective
+							data-class-id="<?php echo esc_attr( (string) $question->class_id ); ?>"
+							hidden
+						>
+							<input
+								type="checkbox"
+								name="perspectives[]"
+								value="<?php echo esc_attr( (string) $question->id ); ?>"
+							>
+
+							<?php echo esc_html( $question->question_text ); ?>
+						</label>
+					<?php endforeach; ?>
+				</div>
+
+				<div class="cop-induction-actions">
+					<button
+						type="submit"
+						name="start_mode"
+						value="normal"
+					>
+						Next step
+					</button>
+
+					<button
+						type="submit"
+						name="start_mode"
+				</div>
+			</form>
+
+		</div>
+
+	</div>
+
+</main>
+
+<?php get_footer(); ?>

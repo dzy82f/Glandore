@@ -1,0 +1,96 @@
+<?php
+/**
+ * Artefact list renderer
+ *
+ * Supports:
+ * - Flat artefacts
+ * - Hierarchical artefacts via 'parent'
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+$artefacts = $args['artefacts'] ?? [];
+
+if ( empty( $artefacts ) || ! is_array( $artefacts ) ) {
+    return;
+}
+
+/**
+ * Compute depth of an artefact based on parent chain
+ */
+function artefact_depth( array $item, array $items ): int {
+    $depth = 0;
+
+    while ( isset( $item['parent'] ) ) {
+        $found = false;
+
+        foreach ( $items as $candidate ) {
+            if (
+                isset( $candidate['title'] ) &&
+                $candidate['title'] === $item['parent']
+            ) {
+                $item  = $candidate;
+                $depth++;
+                $found = true;
+                break;
+            }
+        }
+
+        if ( ! $found ) {
+            break;
+        }
+    }
+
+    return $depth;
+}
+?>
+
+<ul class="artefact-list">
+<?php foreach ( $artefacts as $artefact ) : ?>
+
+    <?php
+    if (
+        ! is_array( $artefact ) ||
+        empty( $artefact['title'] ) ||
+        empty( $artefact['url'] )
+    ) {
+        continue;
+    }
+
+    $depth = artefact_depth( $artefact, $artefacts );
+
+    $url  = esc_url( $artefact['url'] );
+    $path = parse_url( $url, PHP_URL_PATH ) ?? '';
+
+    // 1) PDF detection (your existing behaviour)
+    $is_pdf = str_ends_with(
+        strtolower( $path ),
+        '.pdf'
+    );
+
+    // 2) External link detection (e.g. LinkedIn)
+    $scheme = parse_url( $url, PHP_URL_SCHEME ) ?? '';
+    $host   = parse_url( $url, PHP_URL_HOST ) ?? '';
+
+    $site_host = parse_url( home_url(), PHP_URL_HOST ) ?? '';
+
+    $is_http  = in_array( $scheme, [ 'http', 'https' ], true );
+    $is_external = $is_http && $host && ( $host !== $site_host );
+
+    // 3) Open in new tab if PDF or external
+    $open_new_tab = $is_pdf || $is_external;
+    ?>
+
+    <li class="artefact depth-<?php echo (int) $depth; ?>">
+        <a href="<?php echo $url; ?>"
+           <?php if ( $open_new_tab ) : ?>
+               target="_blank" rel="noopener noreferrer"
+           <?php endif; ?>>
+            <?php echo esc_html( $artefact['title'] ); ?>
+        </a>
+    </li>
+
+<?php endforeach; ?>
+</ul>

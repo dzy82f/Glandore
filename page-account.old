@@ -1,0 +1,194 @@
+<?php
+/**
+ * Template Name: Glandore – Account
+ * Template Post Type: page
+ *
+ * Front-end “My account” card backed by WordPress core.
+ * Renders as a full page or as a modal fragment (?account_modal=1).
+ */
+
+if ( ! is_user_logged_in() ) {
+    wp_safe_redirect( wp_login_url( home_url( '/' ) ) );
+    exit;
+}
+
+$is_modal = isset( $_GET['account_modal'] ) && $_GET['account_modal'] === '1';
+
+$user         = wp_get_current_user();
+$display_name = $user->display_name ? $user->display_name : $user->user_login;
+$email        = $user->user_email;
+
+// Core URLs.
+$profile_url  = esc_url( admin_url( 'profile.php' ) );
+$lostpass_url = esc_url( wp_lostpassword_url() );
+$logout_url   = esc_url( wp_logout_url( home_url( '/' ) ) );
+
+// --------------------------------------------------------
+// Build the full account card markup once.
+// --------------------------------------------------------
+ob_start();
+?>
+<section class="account-panel" aria-labelledby="account-panel-title">
+
+    <header class="account-panel-header">
+        <h1 id="account-panel-title" class="account-panel-title">
+            My account
+        </h1>
+    </header>
+
+    <div class="account-panel-inner">
+
+        <nav class="account-panel-nav" aria-label="Account">
+            <ul class="account-panel-tabs">
+                <li class="account-panel-tab account-panel-tab--active">
+                    <span class="account-panel-tab-label">
+                        <?php esc_html_e( 'Dashboard', 'glandore' ); ?>
+                    </span>
+                </li>
+                <li class="account-panel-tab">
+                    <a class="account-panel-tab-link" href="<?php echo $profile_url; ?>">
+                        <?php esc_html_e( 'Edit Profile', 'glandore' ); ?>
+                    </a>
+                </li>
+                <li class="account-panel-tab">
+                    <a class="account-panel-tab-link" href="<?php echo $lostpass_url; ?>">
+                        <?php esc_html_e( 'Edit Password', 'glandore' ); ?>
+                    </a>
+                </li>
+                <li class="account-panel-tab">
+                    <a class="account-panel-tab-link" href="<?php echo $logout_url; ?>">
+                        <?php esc_html_e( 'User Logout', 'glandore' ); ?>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="account-panel-body">
+
+            <div class="account-panel-welcome">
+                <p class="account-panel-greeting">
+                    <?php
+                    printf(
+                        /* translators: %s: display name */
+                        esc_html__( 'Welcome, %s', 'glandore' ),
+                        esc_html( $display_name )
+                    );
+                    ?>
+                </p>
+
+                <div class="account-panel-avatar">
+                    <span class="account-panel-avatar-circle"></span>
+                </div>
+            </div>
+
+            <div class="account-panel-details">
+                <p>
+                    From your account dashboard you can:
+                </p>
+                <ul class="account-panel-actions">
+                    <li>
+                        Review your account email:
+                        <strong><?php echo esc_html( $email ); ?></strong>
+                    </li>
+                    <li>
+                        <a href="<?php echo $profile_url; ?>">Edit your profile details</a>
+                        in WordPress.
+                    </li>
+                    <li>
+                        <a href="<?php echo $lostpass_url; ?>">Change your password</a>
+                        using the secure reset flow.
+                    </li>
+                </ul>
+
+                <p class="account-panel-signout">
+                    <?php
+                    printf(
+                        /* translators: %s: display name */
+                        esc_html__( 'Not %s?', 'glandore' ),
+                        esc_html( $display_name )
+                    );
+                    ?>
+                    <a href="<?php echo $logout_url; ?>">Sign out</a>
+                </p>
+            </div>
+
+        </div><!-- .account-panel-body -->
+
+    </div><!-- .account-panel-inner -->
+
+</section><!-- .account-panel -->
+<?php
+$account_card = ob_get_clean();
+
+// --------------------------------------------------------
+// Modal fragment mode: just output the card.
+// --------------------------------------------------------
+if ( $is_modal ) {
+    echo $account_card;
+    return;
+}
+
+// --------------------------------------------------------
+// Full-page mode: normal header/footer wrapper.
+// --------------------------------------------------------
+get_header();
+?>
+<main id="primary" class="site-main account-page" role="main">
+    <div class="account-page-inner">
+        <?php echo $account_card; ?>
+    </div>
+</main>
+<?php
+get_footer();
+
+$is_modal = isset( $_GET['account_modal'] ) && $_GET['account_modal'] === '1';
+
+if ( ! $is_modal ) {
+
+    // Base redirect target: home page.
+    $home_url = home_url( '/' );
+
+    // Start from the original query string (e.g. ur_tab=edit-profile).
+    $query_string = isset( $_SERVER['QUERY_STRING'] ) ? $_SERVER['QUERY_STRING'] : '';
+    $params       = array();
+
+    if ( $query_string !== '' ) {
+        parse_str( $query_string, $params );
+    }
+
+    // Ensure we are not carrying through any stale modal flag.
+    unset( $params['account_modal'] );
+
+    // Add our own signal so the front page knows to open the modal.
+    $params['account'] = '1';
+
+    $redirect = add_query_arg( $params, $home_url );
+
+    wp_safe_redirect( $redirect );
+    exit;
+}
+
+// ---------------------------------------------------------------------
+// Modal fragment only – no header/footer, just the account panel.
+// ---------------------------------------------------------------------
+?>
+<section class="account-panel" aria-labelledby="account-panel-title">
+
+    <header class="account-panel-header">
+        <h1 id="account-panel-title" class="account-panel-title">
+            My account
+        </h1>
+    </header>
+
+    <div class="account-panel-body">
+        <?php
+        if ( have_posts() ) :
+            while ( have_posts() ) :
+                the_post();
+                the_content();
+            endwhile;
+        endif;
+        ?>
+    </div>
+
+</section>

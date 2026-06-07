@@ -1,0 +1,1779 @@
+grep: /var/www/glandore.com/public/wp-content/themes/glandore/debug/cop-grep.txt: input file is also the output
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-79-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-80-	if ( '' !== $name ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-81-		return $name;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-82-	}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-83-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-84-	// Fallbacks if meta is missing.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-85-	if ( ! empty( $user->display_name ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-86-		return (string) $user->display_name;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-87-	}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-88-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-89-	return (string) $user->user_login;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-90-}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-91- 
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-92-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-93- * Get or create a CoP contributor row for a given user.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-94- *
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-95- * Ensures display_name is always "first_name last_name" from usermeta,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-96- * with sane fallbacks.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-97- *
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-98- * @param int $user_id WordPress user ID.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php:99: * @return object|null Row from wp_cop_contributor or null on failure.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-100- */
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-101-function glandore_cop_get_or_create_contributor_for_user( int $user_id ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-102-	global $wpdb;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-103-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-104-	$table = glandore_cop_table( 'contributor' );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-105-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-106-	$user = get_userdata( $user_id );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-107-	if ( ! $user ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-108-		return null;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-109-	}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-110-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-111-	$canonical_name = glandore_cop_build_contributor_display_name( $user );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-112-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-113-	// Try to find an existing contributor row for this user.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-114-	$contributor = $wpdb->get_row(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-115-		$wpdb->prepare(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-116-			"SELECT * FROM {$table} WHERE user_id = %d LIMIT 1",
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-117-			$user_id
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-118-		)
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-119-	);
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-388- * @return array
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-389- */
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-390-function glandore_cop_get_posts_by_thread( int $thread_id ) : array {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-391-	global $wpdb;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-392-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-393-	$table = glandore_cop_table( 'post' );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-394-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-395-	return $wpdb->get_results(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-396-		$wpdb->prepare(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-397-			"SELECT * FROM $table WHERE thread_id = %d AND status = 'published' ORDER BY created_at ASC, id ASC",
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-398-			$thread_id
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-399-		)
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-400-	);
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-401-}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-402-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-403-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-404- * Get inducted CoP contributors for the selector + bio pane.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-405- *
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-406- * Definition of "contributor" (for now):
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-407- * - glandore_cop_about_complete = 1
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php:408: * - cop_profile_visible = 1
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php:409: * - cop_profile_bio is non-empty
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-410- *
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-411- * Returns an array of:
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-412- *   [
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-413- *     'key'          => 'u235' or 'ariadne',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-414- *     'user_id'      => int|null,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-415- *     'display_name' => string,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-416- *     'bio_html'     => string,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-417- *     'is_virtual'   => bool,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-418- *   ]
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-419- *
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php:420: * This pulls directly from usermeta (induction data) and adds Ariadne
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-421- * as a virtual contributor.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-422- *
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-423- * @return array
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-424- */
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-425-function glandore_cop_get_inducted_contributors_for_selector() : array {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-426-	$results = array();
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-427-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php:428:	// 1. Real users who have completed induction and are visible.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-429-	$user_args = array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-430-		'meta_query' => array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-431-			'relation' => 'AND',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-432-			array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-433-				'key'     => 'glandore_cop_about_complete',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-434-				'value'   => '1',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-435-				'compare' => '=',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-436-			),
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-437-			array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php:438:				'key'     => 'cop_profile_visible',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-439-				'value'   => '1',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-440-				'compare' => '=',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-441-			),
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-442-		),
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-443-		'fields' => array( 'ID' ),
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-444-	);
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-445-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-446-	$users = get_users( $user_args );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-447-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-448-	if ( ! empty( $users ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-449-		foreach ( $users as $user ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-450-			$user_id  = (int) $user->ID;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-451-			$user_obj = get_user_by( 'id', $user_id );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-452-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-453-			if ( ! $user_obj ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-454-				continue;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-455-			}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-456-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php:457:			// Final public CoP bio from induction.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php:458:			$bio_html = (string) get_user_meta( $user_id, 'cop_profile_bio', true );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-459-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-460-			// Skip if bio is effectively empty.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-461-			if ( '' === trim( wp_strip_all_tags( $bio_html ) ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-462-				continue;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-463-			}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-464-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-465-			$display_name = glandore_cop_user_display_name( $user_obj );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-466-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-467-			$results[] = array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-468-				'key'          => 'u' . $user_id,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-469-				'user_id'      => $user_id,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-470-				'display_name' => $display_name,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-471-				'bio_html'     => $bio_html,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-472-				'is_virtual'   => false,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-473-			);
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-474-		}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-475-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-476-		// Sort by display name for a stable, human-friendly dropdown.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-477-		usort(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-478-			$results,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-479-			function ( $a, $b ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-480-				return strcasecmp( $a['display_name'], $b['display_name'] );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-481-			}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-482-		);
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-483-	}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-484-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-485-	// 2. Add Ariadne as a virtual contributor.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-486-	$results[] = array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-487-		'key'          => 'ariadne',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-488-		'user_id'      => null,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-489-		'display_name' => 'Ariadne (Digital Assistant)',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php:490:		'bio_html'     => '<p>Ariadne is an AI Assistant who helps host and curate this Community of Practice. She supports induction, moderates contributions, and works with Julian to develop the methods and artefacts used here.</p>',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-491-		'is_virtual'   => true,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-492-	);
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-493-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-494-	return $results;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-db.php-495-}
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-1-<?php
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-2-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php:3: * CoP – TinyMCE editor styling for induction form.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-4- *
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-5- * Force Fira Sans (matching front-end body font) inside the front-end editors.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-6- *
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-7- * @package glandore
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-8- */
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-9-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-10-if ( ! defined( 'ABSPATH' ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-11-    exit;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-12-}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-13-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-14-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-15- * Add Fira Sans as the content font for TinyMCE on the CoP Induction page.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-16- *
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-17- * This affects the front-end wp_editor() instances (cop_who, cop_work, etc.),
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-18- * not the main admin editor.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-19- *
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-20- * @param array $mce_init TinyMCE init settings.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-21- * @return array
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-22- */
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-tinymce.php-23-function glandore_cop_tinymce_content_style( $mce_init ) {
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-141-    if ( ! $user_id ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-142-        wp_send_json_error(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-143-            array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-144-                'status'  => 'no_user',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-145-                'message' => 'Unable to identify the current user.',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-146-            )
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-147-        );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-148-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-149-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-150-    $edited_raw = isset( $_POST['edited_bio'] ) ? wp_unslash( $_POST['edited_bio'] ) : '';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-151-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-152-    if ( '' === trim( $edited_raw ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-153-        wp_send_json_error(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-154-            array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-155-                'status'  => 'empty_bio',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-156-                'message' => 'The bio cannot be empty.',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-157-            )
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-158-        );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-159-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-160-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php:161:    $original = get_user_meta( $user_id, 'cop_profile_bio_original', true );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-162-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-163-    // Fallback: if there is no original stored, treat the edit as acceptable.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-164-    if ( '' === trim( (string) $original ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php:165:        update_user_meta( $user_id, 'cop_profile_bio', wp_kses_post( $edited_raw ) );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-166-        update_user_meta( $user_id, 'glandore_cop_about_complete', 1 );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-167-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-168-        wp_send_json_success(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-169-            array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-170-                'status'  => 'ok',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-171-                'message' => 'Your bio has been saved.',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-172-            )
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-173-        );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-174-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-175-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-176-    $similarity = glandore_cop_wordset_similarity( $original, $edited_raw );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-177-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-178-    // Threshold: require at least 0.6 similarity.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-179-    $threshold = 0.6;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-180-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-181-    if ( $similarity >= $threshold ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-182-        // Accept the edit.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php:183:        update_user_meta( $user_id, 'cop_profile_bio', wp_kses_post( $edited_raw ) );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-184-        update_user_meta( $user_id, 'glandore_cop_about_complete', 1 );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-185-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-186-        wp_send_json_success(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-187-            array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-188-                'status'     => 'ok',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-189-                'message'    => 'Your bio has been saved.',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-190-                'similarity' => $similarity,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-191-            )
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-192-        );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-193-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-194-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-195-    // Too different – do not save. Return the original HTML so the editor can be reset.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php:196:    $original_html = get_user_meta( $user_id, 'cop_profile_bio_original', true );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-197-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-198-    wp_send_json_error(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-199-        array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-200-            'status'       => 'too_different',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-201-            'message'      => 'Thanks for refining this. For now, the bio needs to stay broadly consistent with the original suggestion.',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-202-            'similarity'   => $similarity,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-203-            'original_bio' => wp_kses_post( $original_html ),
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-204-        )
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-205-    );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-206-}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-bio-editor.php-207-add_action( 'wp_ajax_glandore_cop_save_bio', 'glandore_cop_save_bio' );
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-1-<?php
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-2-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-3- * Community of Practice – profile and gating helpers.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-4- *
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-5- * @package glandore
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-6- */
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-7-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-8-if ( ! defined( 'ABSPATH' ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-9-    exit;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-10-}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-11-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-12-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:13: * Check if current (or given) user has completed the CoP induction
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-14- * AND had their bio locked in.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-15- *
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-16- * @param int $user_id
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-17- * @return bool
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-18- */
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-19-function glandore_cop_is_profile_complete( $user_id = 0 ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-20-    if ( ! $user_id ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-21-        $user_id = get_current_user_id();
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-22-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-23-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-24-    if ( ! $user_id ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-25-        return false;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-26-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-27-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-28-    return (bool) get_user_meta( $user_id, 'glandore_cop_about_complete', true );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-29-}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-30-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-31-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-32- * Convenience helper: is the current user allowed to contribute?
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-33- *
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-73-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-74-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-75-    $a_words = array_unique( preg_split( '/\s+/', $a ) );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-76-    $b_words = array_unique( preg_split( '/\s+/', $b ) );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-77-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-78-    if ( empty( $a_words ) || empty( $b_words ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-79-        return 0.0;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-80-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-81-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-82-    $intersection = array_intersect( $a_words, $b_words );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-83-    $union        = array_unique( array_merge( $a_words, $b_words ) );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-84-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-85-    if ( 0 === count( $union ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-86-        return 0.0;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-87-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-88-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-89-    return count( $intersection ) / count( $union );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-90-}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-91-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-92-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:93: * AJAX: handle CoP induction form submission.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-94- */
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:95:function glandore_cop_ajax_submit_induction() {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-96-    if ( ! is_user_logged_in() ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-97-        wp_send_json_error( array( 'message' => 'Not logged in.' ), 401 );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-98-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-99-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:100:    check_ajax_referer( 'glandore_cop_induction', 'cop_induction_nonce' );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-101-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-102-    $user_id = get_current_user_id();
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-103-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-104-    // Basic fields.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-105-    $location = isset( $_POST['location'] ) ? sanitize_text_field( wp_unslash( $_POST['location'] ) ) : '';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-106-    $industry = isset( $_POST['industry'] ) ? sanitize_text_field( wp_unslash( $_POST['industry'] ) ) : '';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-107-    $role     = isset( $_POST['role'] ) ? sanitize_text_field( wp_unslash( $_POST['role'] ) ) : '';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-108-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-109-    // RTE fields – allow basic markup.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-110-    $who      = isset( $_POST['who'] ) ? wp_kses_post( wp_unslash( $_POST['who'] ) ) : '';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-111-    $position = isset( $_POST['position'] ) ? sanitize_text_field( wp_unslash( $_POST['position'] ) ) : '';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-112-    $work     = isset( $_POST['work'] ) ? wp_kses_post( wp_unslash( $_POST['work'] ) ) : '';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-113-    $support  = isset( $_POST['support'] ) ? wp_kses_post( wp_unslash( $_POST['support'] ) ) : '';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-114-    $extra    = isset( $_POST['extra'] ) ? wp_kses_post( wp_unslash( $_POST['extra'] ) ) : '';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-115-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-116-    $open_source = ! empty( $_POST['open_source'] ) ? 1 : 0;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-117-    $visible     = ! empty( $_POST['profile_visible'] ) ? 1 : 0;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-118-    $ethos_ok    = ! empty( $_POST['ethos_accepted'] ) ? 1 : 0;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-119-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-120-    // Store raw fields as user_meta.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-121-    update_user_meta( $user_id, 'cop_location_region', $location );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-122-    update_user_meta( $user_id, 'cop_industry_section', $industry );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-123-    update_user_meta( $user_id, 'cop_role_category', $role );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-124-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-125-    update_user_meta( $user_id, 'cop_intro_who', $who );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-126-    update_user_meta( $user_id, 'cop_intro_position', $position );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-127-    update_user_meta( $user_id, 'cop_intro_work', $work );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-128-    update_user_meta( $user_id, 'cop_intro_support', $support );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-129-    update_user_meta( $user_id, 'cop_intro_extra', $extra );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-130-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-131-    update_user_meta( $user_id, 'cop_open_source_ok', $open_source );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:132:    update_user_meta( $user_id, 'cop_profile_visible', $visible );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-133-    update_user_meta( $user_id, 'cop_ethos_accepted', $ethos_ok );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-134-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-135-    // Build combined text for the gatekeeper.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-136-    $opening_parts = array();
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-137-    if ( $who ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-138-        $opening_parts[] = 'Who they are: ' . $who;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-139-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-140-    if ( $position ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-141-        $opening_parts[] = 'Position in the organisation: ' . $position;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-142-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-143-    if ( $work ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-144-        $opening_parts[] = 'Work they do: ' . $work;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-145-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-146-    if ( $extra ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-147-        $opening_parts[] = 'Additional context: ' . $extra;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-148-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-149-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-150-    $opening = implode( "\n\n", $opening_parts );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-151-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-152-    $interests_text = $support;
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-209-    // ---------------------------------
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-210-    if ( $display_name ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-211-        // Replace optional %%NAME%% placeholder (used by local fallback).
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-212-        if ( false !== strpos( $bio, '%%NAME%%' ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-213-            $bio = str_replace( '%%NAME%%', $display_name, $bio );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-214-        }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-215-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-216-        // If the model used "this member", swap the first occurrence.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-217-        if ( stripos( $bio, 'this member' ) !== false ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-218-            $bio = preg_replace( '/\b[Tt]his member\b/', $display_name, $bio, 1 );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-219-        }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-220-    } else {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-221-        // No usable name – just strip the placeholder if present.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-222-        if ( false !== strpos( $bio, '%%NAME%%' ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-223-            $bio = str_replace( '%%NAME%%', 'This member', $bio );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-224-        }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-225-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-226-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-227-    // Store the model / local explanation for diagnostics,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-228-    // but build our *own* user-facing message separately.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:229:    update_user_meta( $user_id, 'cop_profile_bio', $bio );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-230-    update_user_meta( $user_id, 'cop_about_decision', $decision );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-231-    update_user_meta( $user_id, 'cop_about_status', $status );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-232-    update_user_meta( $user_id, 'cop_about_explanation', $explanation );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-233-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-234-    if ( ! empty( $questions ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-235-        update_user_meta( $user_id, 'cop_learning_questions', wp_json_encode( $questions ) );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-236-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-237-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-238-    // Store the original bio exactly once as an anchor.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:239:    $existing_original = get_user_meta( $user_id, 'cop_profile_bio_original', true );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-240-    if ( '' === $existing_original && '' !== $bio ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:241:        update_user_meta( $user_id, 'cop_profile_bio_original', $bio );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-242-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-243-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-244-    // Only treat as "complete" when the status is welcome (decision pass).
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-245-    if ( 'pass' === $decision && 'welcome' === $status ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-246-        update_user_meta( $user_id, 'glandore_cop_about_complete', 1 );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-247-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-248-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-249-    // --------------------------
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-250-    // User-facing message (UI).
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-251-    // --------------------------
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-252-    $display_message = '';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-253-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-254-    if ( 'welcome' === $status ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-255-        $display_message = 'This is enough for now to start contributing. Once the bio has been reviewed, the profile can always be refined or expanded later.';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-256-    } elseif ( 'need_more_detail' === $status ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-257-        if ( '' === $who_plain || '' === $work_plain ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-258-            $display_message = 'Please add at least a short sentence under both “How would you briefly describe who you are?” and “How would you briefly describe the work you do?” before sending your introduction.';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-259-        } elseif ( ! $ethos_ok ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-260-            $display_message = 'To take part in this Community, please confirm that you accept the ethos by ticking the box above.';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-261-        } else {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-262-            $display_message = 'At the moment, what you have written does not yet give others enough sense of who you are and the work you do. Please add a few more sentences in ordinary language and send again.';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-263-        }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-264-    } elseif ( 'not_suitable' === $status ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-265-        $display_message = 'From what you have written, it sounds as though you are not currently interested in taking part in this Community of Practice, or the way you describe your role is not compatible with the kind of work we do here. If that changes and you would like to participate seriously, you are very welcome to revisit your introduction and submit an updated version.';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-266-    } else {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-267-        // Safety net.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-268-        $display_message = 'Something about your introduction is unclear at the moment. Please review what you have written, add a little more detail about who you are and the work you do, and try again.';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-269-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-270-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-271-    wp_send_json_success(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-272-        array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-273-            'status'   => $status,          // welcome / need_more_detail / not_suitable
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-274-            'decision' => $decision,        // pass / fail (internal)
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-275-            'bio'      => $bio,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-276-            'message'  => $display_message, // ONLY this goes to the UI
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-277-        )
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-278-    );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-279-}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:280:add_action( 'wp_ajax_glandore_cop_submit_induction', 'glandore_cop_ajax_submit_induction' );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-281-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-282-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-283-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:284: * AJAX: save edited CoP bio after induction, with similarity check.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-285- */
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-286-function glandore_cop_ajax_save_bio() {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-287-    if ( ! is_user_logged_in() ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-288-        wp_send_json_error( array( 'message' => 'Not logged in.' ), 401 );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-289-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-290-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:291:    check_ajax_referer( 'glandore_cop_induction', 'cop_induction_nonce' );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-292-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-293-    $user_id = get_current_user_id();
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-294-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-295-    $bio = isset( $_POST['bio'] ) ? wp_kses_post( wp_unslash( $_POST['bio'] ) ) : '';
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-296-    $bio = trim( $bio );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-297-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-298-    if ( '' === $bio ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-299-        wp_send_json_error(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-300-            array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-301-                'status'  => 'empty',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-302-                'message' => 'Please add a short bio before saving.',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-303-            ),
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-304-            400
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-305-        );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-306-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-307-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-308-    $plain = trim( wp_strip_all_tags( $bio ) );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-309-    if ( strlen( $plain ) < 40 ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-310-        wp_send_json_error(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-311-            array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-312-                'status'  => 'too_short',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-313-                'message' => 'For the Contributors page, the bio needs to be at least a couple of sentences.',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-314-            ),
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-315-            400
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-316-        );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-317-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-318-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:319:    $original = get_user_meta( $user_id, 'cop_profile_bio_original', true );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:320:    $current  = get_user_meta( $user_id, 'cop_profile_bio', true );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-321-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-322-    // If there is no original yet (safety), accept and set both.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-323-    if ( '' === $original ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:324:        update_user_meta( $user_id, 'cop_profile_bio_original', $bio );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:325:        update_user_meta( $user_id, 'cop_profile_bio', $bio );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-326-        update_user_meta( $user_id, 'glandore_cop_about_complete', 1 );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-327-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-328-        wp_send_json_success(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-329-            array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-330-                'status'   => 'ok',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-331-                'message'  => 'Bio saved.',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-332-                'similarity' => 1.0,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-333-            )
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-334-        );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-335-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-336-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-337-    // Compute similarity between original and edited.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-338-    $similarity = glandore_cop_jaccard_similarity( $original, $bio );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-339-    $threshold  = 0.60;
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-340-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-341-    if ( $similarity < $threshold ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-342-        // Too different – do not save, reset to original on the client.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-343-        wp_send_json_error(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-344-            array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-345-                'status'       => 'too_different',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-346-                'message'      => 'Thanks for refining this. For now, the bio needs to stay broadly consistent with the original suggestion. Please adjust it rather than replacing it entirely.',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-347-                'original_bio' => $original,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-348-                'similarity'   => $similarity,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-349-            ),
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-350-            200
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-351-        );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-352-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-353-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-354-    // Similar enough – accept as the public bio and mark complete.
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php:355:    update_user_meta( $user_id, 'cop_profile_bio', $bio );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-356-    update_user_meta( $user_id, 'glandore_cop_about_complete', 1 );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-357-
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-358-    wp_send_json_success(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-359-        array(
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-360-            'status'     => 'ok',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-361-            'message'    => 'Bio saved.',
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-362-            'similarity' => $similarity,
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-363-        )
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-364-    );
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-365-}
+/var/www/glandore.com/public/wp-content/themes/glandore/inc/cop-profile.php-366-add_action( 'wp_ajax_glandore_cop_save_bio', 'glandore_cop_ajax_save_bio' );
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-74-<option value="Sustainability">Sustainability</option>
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-75-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-76-<option value="Oil &amp Gas" <?php selected( $industry, 'Oil &amp Gas' ); ?>>Oil &amp Gas</option>
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-77-<option value="Sustainability">Sustainability <?php selected( $industry, 'Sustainability' ); ?>>Sustainability</option>
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-78-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-79-https://glandore.com/
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-80-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-81-sudo cp \
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-82-  /var/www/staging.glandore.com/public/wp-content/mu-plugins/glandore-disable-completion-modal.php \
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-83-  /var/www/glandore.com/public/wp-content/mu-plugins/
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-84-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-85-wp user meta delete 235 glandore_cop_about_complete
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-86-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-87-cd C:\Tools\plantuml
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-88-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-89-java -jar .\plantuml.jar -tpng .\LO2_CoP_MVS_Browser_v0_2.puml
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-90-java -jar .\plantuml.jar -tpng .\LO2_CoP_MVS_Context_v0_2.puml
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-91-java -jar .\plantuml.jar -tpng .\LO2_CoP_MVS_Domain_v0_2.puml
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-92-java -jar .\plantuml.jar -tpng .\LO2_CoP_MVS_Flow_v0_2.puml
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-93-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt:94:java -jar .\plantuml.jar -tpng .\cop-induction-bio-flow.puml
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-95-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-96-java -jar .\plantuml.jar -tpng "C:\Users\julia_exuztfd\OneDrive\God's Ledger\outline_v0.1.puml"
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-97-java -jar .\plantuml.jar -tpng "C:\Users\julia_exuztfd\OneDrive\God's Ledger\gl_2.puml"
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-98-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-99-java -jar .\plantuml.jar -tpng "C:\Users\julia_exuztfd\OneDrive\Portfolio\chatGPT\Tychevia 2.0\Community of Practice\cop_sequence_v0_1.puml"
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-100-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-101-java -jar .\plantuml.jar -tpng "C:\Users\julia_exuztfd\OneDrive\Portfolio\chatGPT\GlandoreAssociates\WebSite\.puml\schema_1.puml"
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-102-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-103-wp db query "
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-104-DELETE FROM wp_usermeta
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-105-WHERE user_id = 235
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-106-  AND (
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-107-    meta_key LIKE 'cop_%'
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-108-    OR meta_key LIKE 'glandore_cop_%'
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-109-  );
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-110-"
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-111-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-112-Financials,
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-113-Basic Materials,
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-114-Energy,
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-286-wp db query "SHOW CREATE TABLE wp_cop_contributions\G"  
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-287-  
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-288-wp db query "
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-289-  SELECT id, thread_id, user_id, title, content, created_at, status
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-290-  FROM wp_cop_contributions
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-291-  ORDER BY id
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-292-  \G"
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-293-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-294-wp db query "DELETE FROM wp_cop_threads WHERE id IN (1, 2);"
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-295-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-296-wp db query "SHOW CREATE TABLE wp_cop_snapshots\G"
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-297-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-298-wp db query "
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-299-  SELECT *
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-300-  FROM wp_cop_snapshots
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-301-  ORDER BY id
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-302-  \G"
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-303-
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-304-wp db query "
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-305-  SET FOREIGN_KEY_CHECKS = 0;
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt:306:  TRUNCATE TABLE wp_cop_contributor;
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-307-  TRUNCATE TABLE wp_cop_threads;
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-308-  TRUNCATE TABLE wp_cop_contributions;
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-309-  TRUNCATE TABLE wp_cop_snapshots;
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-310-  SET FOREIGN_KEY_CHECKS = 1;
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/jottings_v0_1.txt-311-"  
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/ariadne.txt-1-Ariadne (digital assistant)
+/var/www/glandore.com/public/wp-content/themes/glandore/stuff/ariadne.txt:2:Ariadne is a Tychevia-based AI assistant who helps host and curate this Community of Practice. She supports induction, moderates contributions, and works with Julian to develop the methods and artefacts used here.
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-124-   ============================================ */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-125-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-126-/* Page frame */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-127-.cop-dialogue-main {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-128-  background: var(--cop-bg-page);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-129-  padding: 40px 0 80px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-130-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-131-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-132-/* Card container */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-133-.cop-dialogue-main .cop-dialogue-container {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-134-  max-width: 860px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-135-  margin: 0 auto;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-136-  padding: 32px 32px 40px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-137-  background: var(--cop-bg-panel);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-138-  border-radius: var(--cop-radius-lg);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-139-  box-shadow: var(--cop-shadow-card);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-140-  box-sizing: border-box;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-141-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-142-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-143-/* Induction heading inside the card */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:144:.cop-dialogue-main .cop-dialogue-container .entry-content .cop-induction-heading {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-145-  margin: 0 0 1rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-146-  font-size: 1.2rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-147-  font-weight: 500;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-148-  color: var(--tychevia-blue);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-149-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-150-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-151-.cop-dialogue-main .cop-dialogue-container p {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-152-  line-height: 1.4;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-153-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-154-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-155-/* Form layout */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:156:.cop-induction-form { margin-top: 1.5rem; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:157:.cop-induction-form .field { margin-bottom: 1.4rem; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-158-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-159-/* Labels */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:160:.cop-induction-form label {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-161-  display: block;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-162-  font-size: 0.95rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-163-  font-weight: 500;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-164-  margin-bottom: 0.35rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-165-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-166-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-167-/* Inputs / selects / textareas */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:168:.cop-induction-form .cop-text-input,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:169:.cop-induction-form input[type="text"],
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:170:.cop-induction-form input[type="email"],
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:171:.cop-induction-form select,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:172:.cop-induction-form textarea {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-173-  width: 100%;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-174-  max-width: 100%;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-175-  padding: 10px 12px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-176-  border-radius: var(--cop-radius-sm);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-177-  border: 1px solid #ced2df;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-178-  background-color: #fdfdff;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-179-  font: inherit;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-180-  line-height: 1.4;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-181-  box-sizing: border-box;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-182-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-183-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-184-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:185:.cop-induction-form textarea {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-186-  min-height: 110px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-187-  resize: vertical;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-188-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-189-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:190:/* Hide TinyMCE status / element path in CoP induction editors */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:191:.cop-induction-form .mce-statusbar,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:192:.cop-induction-form .mce-path {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-193-  display: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-194-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-195-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-196-/* Focus states */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:197:.cop-induction-form .cop-text-input:focus,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:198:.cop-induction-form input[type="text"]:focus,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:199:.cop-induction-form input[type="email"]:focus,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:200:.cop-induction-form select:focus,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:201:.cop-induction-form textarea:focus {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-202-  outline: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-203-  border-color: #1e5ad6;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-204-  box-shadow: 0 0 0 3px rgba(30, 90, 214, 0.15);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-205-  background-color: #ffffff;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-206-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-207-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-208-/* Select arrow */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:209:.cop-induction-form select {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-210-  -webkit-appearance: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-211-  -moz-appearance: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-212-  appearance: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-213-  background-image:
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-214-    linear-gradient(45deg, transparent 50%, #555 50%),
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-215-    linear-gradient(135deg, #555 50%, transparent 50%);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-216-  background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-217-  background-size: 6px 6px, 6px 6px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-218-  background-repeat: no-repeat;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-219-  padding-right: 34px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-220-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-221-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-222-/* Checkbox fields */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:223:.cop-induction-form .field input[type="checkbox"] { margin-right: 0.5rem; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:224:.cop-induction-form .field input[type="checkbox"] + span { font-weight: 400; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-225-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-226-/* Tighter spacing between agreement checkboxes */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:227:.cop-induction-form .field:has(input[type="checkbox"]) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-228-  margin-bottom: 0.6rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-229-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-230-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-231-/* Actions row + submit button */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:232:.cop-induction-actions { margin-top: 0.5rem; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-233-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:234:.cop-induction-actions button[type="submit"] {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-235-  display: inline-block;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-236-  padding: 10px 22px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-237-  border-radius: 20px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-238-  border: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-239-  font: inherit;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-240-  font-weight: 500;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-241-  letter-spacing: 0.03em;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-242-  text-transform: uppercase;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-243-  background: #1e5ad6;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-244-  color: #ffffff;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-245-  cursor: pointer;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-246-  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-247-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-248-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:249:.cop-induction-actions button[type="submit"]:hover {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-250-  background: #1747aa;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-251-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.10);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-252-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-253-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:254:.cop-induction-actions button[type="submit"]:active {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-255-  transform: translateY(1px);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-256-  box-shadow: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-257-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-258-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:259:.cop-induction-actions button[disabled] {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-260-  opacity: 0.6;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-261-  cursor: default;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-262-  box-shadow: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-263-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-264-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-265-/* Result / outcome box */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:266:.cop-induction-result {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-267-  margin-top: 1.5rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-268-  padding: 12px 14px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-269-  border-radius: var(--cop-radius-md);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-270-  font-size: 0.92rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-271-  line-height: 1.5;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-272-  background-color: #f1f2f7;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-273-  border: 1px solid var(--cop-border-soft);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-274-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-275-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:276:.cop-induction-result.is-pass {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-277-  background-color: #e9f7f1;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-278-  border-color: #3fa46a;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-279-  color: #205837;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-280-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-281-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:282:.cop-induction-result.is-fail,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:283:.cop-induction-result.is-clarify {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-284-  background-color: #fff5f2;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-285-  border-color: #e48b73;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-286-  color: #7c2c15;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-287-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-288-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:289:.cop-induction-result--not-suitable {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-290-  background-color: #fff3f3;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-291-  border-color: #e29a9a;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-292-  color: #7b2020;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-293-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-294-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-295-/* Role / Industry / Location row */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:296:.cop-induction-form .field-row--ril {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-297-  display: flex;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-298-  flex-wrap: wrap;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-299-  gap: 16px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-300-  margin-bottom: 1.4rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-301-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:302:.cop-induction-form .field-row--ril .field {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-303-  flex: 1 1 0;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-304-  margin-bottom: 0;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-305-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-306-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-307-/* Induction editor heights */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-308-#wp-cop_who-wrap .wp-editor-container,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-309-#wp-cop_work-wrap .wp-editor-container { min-height: 200px; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-310-#cop_who_ifr,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-311-#cop_work_ifr { height: 200px !important; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-312-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-313-#wp-cop_support-wrap .wp-editor-container,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-314-#wp-cop_extra-wrap .wp-editor-container { min-height: 100px; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-315-#cop_support_ifr,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-316-#cop_extra_ifr { height: 100px !important; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-317-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-318-/* Bio block */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:319:.cop-induction-bio {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-320-  margin-top: 0.75rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-321-  padding: 10px 12px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-322-  border-radius: var(--cop-radius-sm);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-323-  background: var(--cop-bg-page);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-324-  border: 1px solid var(--cop-border-soft);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-325-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-326-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-327-/* Bio review */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-328-.cop-bio-review {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-329-  margin-top: 1.5rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-330-  padding: 14px 16px 18px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-331-  border-radius: var(--cop-radius-md);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-332-  border: 1px solid var(--cop-border-soft);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-333-  background: var(--cop-bg-soft);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-334-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-335-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-336-.cop-bio-review-actions {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-337-  margin-top: 0.75rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-338-  display: flex;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-339-  align-items: center;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-340-  gap: 0.75rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-341-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-342-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-343-.cop-bio-save-status {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-344-  font-size: var(--cop-text-xs);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-345-  opacity: 0.8;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-346-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-347-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-348-/* Mobile tweaks */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-349-@media (max-width: 768px) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-350-  .cop-dialogue-main { padding: 24px 0 48px; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-351-  .cop-dialogue-main .cop-dialogue-container {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-352-    margin: 0 16px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-353-    padding: 24px 18px 28px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-354-  }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-355-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:356:  .cop-induction-form .field-row--ril {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-357-    flex-direction: column;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-358-    gap: 0.75rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-359-  }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-360-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-361-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-362-/* ============================================
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-363-   CoP – Discussions (Figure 1) Layout + scrolling
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-364-   ============================================ */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-365-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-366-/* Clamp the Discussions template so only inner panes scroll */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-367-body.page-template-page-cop-discussions { overflow-y: hidden; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-368-body.page-template-page-cop-discussions .cop-dialogue-main {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-369-  padding-top: 28px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-370-  padding-bottom: 32px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-371-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-372-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-373-/* Give the card a height context */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-374-.cop-discussions-page .cop-dialogue-container {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-375-  min-height: calc(100vh - var(--cop-vh-frame-offset));
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-376-  display: flex;
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-413-  border-bottom: 1px solid var(--cop-border-strong);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-414-  background: var(--cop-bg-panel);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-415-  flex: 0 0 auto;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-416-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-417-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-418-.cop-discussions-box-body {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-419-  padding: 0.7rem 0.8rem 0.9rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-420-  flex: 1 1 auto;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-421-  min-height: 0;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-422-  display: flex;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-423-  flex-direction: column;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-424-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-425-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-426-/* Grid placement */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-427-.cop-discussions-box--contributor { grid-column: 1; grid-row: 1; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-428-.cop-discussions-box--bio         { grid-column: 2; grid-row: 1; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-429-.cop-discussions-box--list        { grid-column: 1; grid-row: 2; min-height: 360px; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-430-.cop-discussions-box--content     { grid-column: 2; grid-row: 2; min-height: 360px; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-431-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-432-/* Heading inside the card */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css:433:.cop-discussions-page .cop-induction-heading {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-434-  font-size: 1.4rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-435-  font-weight: 600;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-436-  margin: 0 0 14px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-437-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-438-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-439-/* Normalise text sizes inside module */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-440-.cop-discussions-page .cop-discussions-box-header,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-441-.cop-discussions-page .cop-discussion-meta,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-442-.cop-discussions-page .cop-discussions-button,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-443-.cop-discussion-list-button,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-444-.cop-discussion-body p,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-445-.cop-bio-scroll p,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-446-.cop-bio-scroll li,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-447-.cop-discussion-empty {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-448-  font-size: var(--cop-text-sm);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-449-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-450-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-451-/* Contributor select */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-452-.cop-contributor-select-block { margin: 0; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css-453-.cop-contributor-label {
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-124-   ============================================ */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-125-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-126-/* Page frame */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-127-.cop-dialogue-main {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-128-  background: var(--cop-bg-page);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-129-  padding: 40px 0 80px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-130-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-131-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-132-/* Card container */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-133-.cop-dialogue-main .cop-dialogue-container {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-134-  max-width: 860px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-135-  margin: 0 auto;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-136-  padding: 32px 32px 40px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-137-  background: var(--cop-bg-panel);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-138-  border-radius: var(--cop-radius-lg);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-139-  box-shadow: var(--cop-shadow-card);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-140-  box-sizing: border-box;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-141-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-142-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-143-/* Induction heading inside the card */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:144:.cop-dialogue-main .cop-dialogue-container .entry-content .cop-induction-heading {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-145-  margin: 0 0 1rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-146-  font-size: 1.2rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-147-  font-weight: 500;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-148-  color: var(--tychevia-blue);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-149-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-150-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-151-.cop-dialogue-main .cop-dialogue-container p {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-152-  line-height: 1.4;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-153-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-154-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-155-/* Form layout */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:156:.cop-induction-form { margin-top: 1.5rem; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:157:.cop-induction-form .field { margin-bottom: 1.4rem; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-158-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-159-/* Labels */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:160:.cop-induction-form label {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-161-  display: block;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-162-  font-size: 0.95rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-163-  font-weight: 500;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-164-  margin-bottom: 0.35rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-165-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-166-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-167-/* Inputs / selects / textareas */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:168:.cop-induction-form .cop-text-input,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:169:.cop-induction-form input[type="text"],
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:170:.cop-induction-form input[type="email"],
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:171:.cop-induction-form select,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:172:.cop-induction-form textarea {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-173-  width: 100%;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-174-  max-width: 100%;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-175-  padding: 10px 12px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-176-  border-radius: var(--cop-radius-sm);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-177-  border: 1px solid #ced2df;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-178-  background-color: #fdfdff;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-179-  font: inherit;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-180-  line-height: 1.4;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-181-  box-sizing: border-box;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-182-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-183-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-184-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:185:.cop-induction-form textarea {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-186-  min-height: 110px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-187-  resize: vertical;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-188-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-189-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:190:/* Hide TinyMCE status / element path in CoP induction editors */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:191:.cop-induction-form .mce-statusbar,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:192:.cop-induction-form .mce-path {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-193-  display: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-194-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-195-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-196-/* Focus states */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:197:.cop-induction-form .cop-text-input:focus,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:198:.cop-induction-form input[type="text"]:focus,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:199:.cop-induction-form input[type="email"]:focus,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:200:.cop-induction-form select:focus,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:201:.cop-induction-form textarea:focus {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-202-  outline: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-203-  border-color: #1e5ad6;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-204-  box-shadow: 0 0 0 3px rgba(30, 90, 214, 0.15);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-205-  background-color: #ffffff;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-206-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-207-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-208-/* Select arrow */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:209:.cop-induction-form select {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-210-  -webkit-appearance: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-211-  -moz-appearance: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-212-  appearance: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-213-  background-image:
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-214-    linear-gradient(45deg, transparent 50%, #555 50%),
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-215-    linear-gradient(135deg, #555 50%, transparent 50%);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-216-  background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-217-  background-size: 6px 6px, 6px 6px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-218-  background-repeat: no-repeat;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-219-  padding-right: 34px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-220-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-221-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-222-/* Checkbox fields */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:223:.cop-induction-form .field input[type="checkbox"] { margin-right: 0.5rem; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:224:.cop-induction-form .field input[type="checkbox"] + span { font-weight: 400; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-225-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-226-/* Tighter spacing between agreement checkboxes */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:227:.cop-induction-form .field:has(input[type="checkbox"]) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-228-  margin-bottom: 0.6rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-229-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-230-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-231-/* Actions row + submit button */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:232:.cop-induction-actions { margin-top: 0.5rem; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-233-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:234:.cop-induction-actions button[type="submit"] {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-235-  display: inline-block;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-236-  padding: 10px 22px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-237-  border-radius: 20px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-238-  border: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-239-  font: inherit;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-240-  font-weight: 500;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-241-  letter-spacing: 0.03em;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-242-  text-transform: uppercase;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-243-  background: #1e5ad6;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-244-  color: #ffffff;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-245-  cursor: pointer;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-246-  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-247-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-248-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:249:.cop-induction-actions button[type="submit"]:hover {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-250-  background: #1747aa;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-251-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.10);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-252-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-253-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:254:.cop-induction-actions button[type="submit"]:active {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-255-  transform: translateY(1px);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-256-  box-shadow: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-257-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-258-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:259:.cop-induction-actions button[disabled] {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-260-  opacity: 0.6;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-261-  cursor: default;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-262-  box-shadow: none;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-263-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-264-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-265-/* Result / outcome box */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:266:.cop-induction-result {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-267-  margin-top: 1.5rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-268-  padding: 12px 14px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-269-  border-radius: var(--cop-radius-md);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-270-  font-size: 0.92rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-271-  line-height: 1.5;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-272-  background-color: #f1f2f7;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-273-  border: 1px solid var(--cop-border-soft);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-274-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-275-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:276:.cop-induction-result.is-pass {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-277-  background-color: #e9f7f1;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-278-  border-color: #3fa46a;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-279-  color: #205837;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-280-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-281-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:282:.cop-induction-result.is-fail,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:283:.cop-induction-result.is-clarify {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-284-  background-color: #fff5f2;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-285-  border-color: #e48b73;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-286-  color: #7c2c15;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-287-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-288-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:289:.cop-induction-result--not-suitable {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-290-  background-color: #fff3f3;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-291-  border-color: #e29a9a;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-292-  color: #7b2020;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-293-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-294-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-295-/* Role / Industry / Location row */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:296:.cop-induction-form .field-row--ril {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-297-  display: flex;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-298-  flex-wrap: wrap;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-299-  gap: 16px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-300-  margin-bottom: 1.4rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-301-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:302:.cop-induction-form .field-row--ril .field {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-303-  flex: 1 1 0;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-304-  margin-bottom: 0;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-305-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-306-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-307-/* Induction editor heights */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-308-#wp-cop_who-wrap .wp-editor-container,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-309-#wp-cop_work-wrap .wp-editor-container { min-height: 200px; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-310-#cop_who_ifr,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-311-#cop_work_ifr { height: 200px !important; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-312-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-313-#wp-cop_support-wrap .wp-editor-container,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-314-#wp-cop_extra-wrap .wp-editor-container { min-height: 100px; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-315-#cop_support_ifr,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-316-#cop_extra_ifr { height: 100px !important; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-317-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-318-/* Bio block */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:319:.cop-induction-bio {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-320-  margin-top: 0.75rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-321-  padding: 10px 12px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-322-  border-radius: var(--cop-radius-sm);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-323-  background: var(--cop-bg-page);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-324-  border: 1px solid var(--cop-border-soft);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-325-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-326-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-327-/* Bio review */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-328-.cop-bio-review {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-329-  margin-top: 1.5rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-330-  padding: 14px 16px 18px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-331-  border-radius: var(--cop-radius-md);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-332-  border: 1px solid var(--cop-border-soft);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-333-  background: var(--cop-bg-soft);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-334-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-335-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-336-.cop-bio-review-actions {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-337-  margin-top: 0.75rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-338-  display: flex;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-339-  align-items: center;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-340-  gap: 0.75rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-341-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-342-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-343-.cop-bio-save-status {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-344-  font-size: var(--cop-text-xs);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-345-  opacity: 0.8;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-346-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-347-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-348-/* Mobile tweaks */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-349-@media (max-width: 768px) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-350-  .cop-dialogue-main { padding: 24px 0 48px; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-351-  .cop-dialogue-main .cop-dialogue-container {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-352-    margin: 0 16px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-353-    padding: 24px 18px 28px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-354-  }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-355-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:356:  .cop-induction-form .field-row--ril {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-357-    flex-direction: column;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-358-    gap: 0.75rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-359-  }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-360-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-361-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-362-/* ============================================
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-363-   CoP – Discussions (Figure 1) Layout + scrolling
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-364-   ============================================ */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-365-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-366-/* Clamp the Discussions template so only inner panes scroll */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-367-body.page-template-page-cop-discussions { overflow-y: hidden; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-368-body.page-template-page-cop-discussions .cop-dialogue-main {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-369-  padding-top: 28px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-370-  padding-bottom: 32px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-371-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-372-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-373-/* Give the card a height context */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-374-.cop-discussions-page .cop-dialogue-container {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-375-  min-height: calc(100vh - var(--cop-vh-frame-offset));
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-376-  display: flex;
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-413-  border-bottom: 1px solid var(--cop-border-strong);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-414-  background: var(--cop-bg-panel);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-415-  flex: 0 0 auto;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-416-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-417-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-418-.cop-discussions-box-body {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-419-  padding: 0.7rem 0.8rem 0.9rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-420-  flex: 1 1 auto;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-421-  min-height: 0;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-422-  display: flex;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-423-  flex-direction: column;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-424-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-425-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-426-/* Grid placement */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-427-.cop-discussions-box--contributor { grid-column: 1; grid-row: 1; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-428-.cop-discussions-box--bio         { grid-column: 2; grid-row: 1; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-429-.cop-discussions-box--list        { grid-column: 1; grid-row: 2; min-height: 360px; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-430-.cop-discussions-box--content     { grid-column: 2; grid-row: 2; min-height: 360px; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-431-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-432-/* Heading inside the card */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak:433:.cop-discussions-page .cop-induction-heading {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-434-  font-size: 1.4rem;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-435-  font-weight: 600;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-436-  margin: 0 0 14px;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-437-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-438-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-439-/* Normalise text sizes inside module */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-440-.cop-discussions-page .cop-discussions-box-header,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-441-.cop-discussions-page .cop-discussion-meta,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-442-.cop-discussions-page .cop-discussions-button,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-443-.cop-discussion-list-button,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-444-.cop-discussion-body p,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-445-.cop-bio-scroll p,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-446-.cop-bio-scroll li,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-447-.cop-discussion-empty {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-448-  font-size: var(--cop-text-sm);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-449-}
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-450-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-451-/* Contributor select */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-452-.cop-contributor-select-block { margin: 0; }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/css/cop.css.bak-453-.cop-contributor-label {
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-1-/* global jQuery, tinymce */
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-2-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-3-jQuery(function ($) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js:4:    var $form = $('#cop-induction-form');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-5-    if (!$form.length) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-6-        return;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-7-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-8-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-9-    var ajaxUrl     = $form.data('ajax-url');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js:10:    var $result     = $('#cop-induction-result');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-11-    var $submit     = $form.find('button[type="submit"], input[type="submit"]');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-12-    var $bioWrapper = $('#cop-bio-review-wrapper');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-13-    var $bioSaveBtn = $('#cop-bio-save');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-14-    var $bioStatus  = $('#cop-bio-save-status');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-15-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-16-    function resetResult() {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-17-        $result
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-18-            .removeClass(
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js:19:                'cop-induction-result--welcome ' +
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js:20:                'cop-induction-result--need-more ' +
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js:21:                'cop-induction-result--not-suitable ' +
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js:22:                'cop-induction-result--error'
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-23-            )
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-24-            .empty();
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-25-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-26-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-27-    function showError(msg) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-28-        resetResult();
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-29-        $result
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js:30:            .addClass('cop-induction-result--error')
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-31-            .html('<p>' + msg + '</p>');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-32-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-33-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-34-    function populateBioEditor(bio) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-35-        if (!$bioWrapper.length) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-36-            return;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-37-        }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-38-        bio = bio || '';
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-39-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-40-        if (typeof tinymce !== 'undefined' && tinymce.get('cop_bio_review')) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-41-            tinymce.get('cop_bio_review').setContent(bio);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-42-        } else {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-43-            $('#cop_bio_review').val(bio);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-44-        }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-45-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-46-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-47-    function toggleBioEditor(show, bio) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-48-        if (!$bioWrapper.length) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-49-            return;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-50-        }
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-71-            var bioContent = '';
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-72-            if (typeof tinymce !== 'undefined' && tinymce.get('cop_bio_review')) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-73-                bioContent = tinymce.get('cop_bio_review').getContent();
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-74-            } else {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-75-                bioContent = $('#cop_bio_review').val();
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-76-            }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-77-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-78-            bioContent = bioContent.trim();
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-79-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-80-            if (!bioContent) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-81-                $bioStatus.text('Please add a short bio before saving.');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-82-                return;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-83-            }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-84-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-85-            $bioSaveBtn.prop('disabled', true);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-86-            $bioStatus.text('Saving…');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-87-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-88-            $.post(ajaxUrl, {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-89-                action: 'glandore_cop_save_bio',
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-90-                bio: bioContent,
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js:91:                cop_induction_nonce: $('#cop_induction_nonce').val()
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-92-            })
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-93-            .done(function (resp) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-94-                if (resp && resp.success) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-95-                    $bioStatus.text('Saved.');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-96-                } else if (resp && resp.data && resp.data.message) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-97-                    $bioStatus.text(resp.data.message);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-98-                } else {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-99-                    $bioStatus.text('There was a problem saving your bio.');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-100-                }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-101-            })
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-102-            .fail(function () {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-103-                $bioStatus.text('There was a technical problem saving your bio.');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-104-            })
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-105-            .always(function () {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-106-                $bioSaveBtn.prop('disabled', false);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-107-            });
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-108-        });
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-109-    }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-110-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-111-    // ------------------------------------------------
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-112-    // Induction form submit
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-113-    // ------------------------------------------------
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-114-    $form.on('submit', function (e) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-115-        e.preventDefault();
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-116-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-117-        if (!ajaxUrl) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-118-            showError('Missing AJAX endpoint.');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-119-            return;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-120-        }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-121-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-122-        $submit.prop('disabled', true);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-123-        resetResult();
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-124-        toggleBioEditor(false);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-125-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-126-        var data = $form.serializeArray();
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js:127:        data.push({ name: 'action', value: 'glandore_cop_submit_induction' });
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-128-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-129-        $.post(ajaxUrl, data)
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-130-        .done(function (resp) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-131-            if (!resp || !resp.success || !resp.data) {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-132-                showError('Something went wrong while saving your introduction. Please try again.');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-133-                return;
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-134-            }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-135-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-136-            var status  = resp.data.status || 'need_more_detail';
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-137-            var bio     = resp.data.bio || '';
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-138-            var message = resp.data.message || '';
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-139-            var html    = '';
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-140-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-141-            resetResult();
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-142-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-143-            if (status === 'welcome') {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-144-                // WELCOME: just the message; bio is handled by editor below
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js:145:                $result.addClass('cop-induction-result--welcome');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-146-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-147-                html += '<p><strong>Welcome.</strong> ' +
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-148-                    (message || 'You can start posting and engaging with the community straight away. You can always refine or expand your profile later.') +
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-149-                    '</p>';
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-150-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-151-                // Show TinyMCE editor prefilled with the generated bio
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-152-                toggleBioEditor(true, bio);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-153-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-154-            } else if (status === 'need_more_detail') {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js:155:                $result.addClass('cop-induction-result--need-more');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-156-                html += '<p>' + (
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-157-                    message ||
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-158-                    'At the moment, what you have written does not yet give others enough sense of who you are and the work you do. Please add a few more sentences in ordinary language and send again.'
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-159-                ) + '</p>';
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-160-                toggleBioEditor(false);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-161-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-162-            } else if (status === 'not_suitable') {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js:163:                $result.addClass('cop-induction-result--not-suitable');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-164-                html += '<p><strong>Thank you for your interest.</strong> Julian feels that, based on what you have written, you may not currently be well suited to participating in this Community of Practice.</p>';
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-165-                html += '<p>This space is for thoughtful, good-faith conversation rather than disruption or quick takes. You are very welcome to update your introduction if you would like to participate seriously, then send it again.</p>';
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-166-                toggleBioEditor(false);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-167-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-168-            } else {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js:169:                $result.addClass('cop-induction-result--error');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-170-                html += '<p>Something about your introduction is unclear at the moment. Please review what you have written, add a little more detail about who you are and the work you do, and try again.</p>';
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-171-                toggleBioEditor(false);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-172-            }
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-173-
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-174-            $result.html(html);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-175-        })
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-176-        .fail(function () {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-177-            showError('There was a technical problem submitting your introduction. Please try again in a moment.');
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-178-        })
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-179-        .always(function () {
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-180-            $submit.prop('disabled', false);
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-181-        });
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-182-    });
+/var/www/glandore.com/public/wp-content/themes/glandore/assets/js/cop-induction.js-183-});
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-62-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-63-  JOIN (
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-64-    SELECT thread_id, version, MAX(id) AS max_id
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-65-    FROM {$snapshots_table}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-66-    GROUP BY thread_id, version
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-67-  ) mi
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-68-    ON mi.thread_id = s.thread_id
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-69-   AND mi.version   = s.version
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-70-   AND mi.max_id    = s.id
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-71-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-72-  ORDER BY t.created_at ASC, s.thread_id ASC
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-73-";
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-74-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-75-$rows = $wpdb->get_results( $sql );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-76-?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-77-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-78-<main id="primary" class="site-main cop-discussions-mobile">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-79-	<div class="cop-dialogue-container">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-80-		<div class="entry-content">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-81-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php:82:			<h3 class="cop-induction-heading">Community discussions</h3>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-83-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-84-			<?php if ( ! empty( $rows ) ) : ?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-85-				<div class="cop-venetian">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-86-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-87-					<?php foreach ( $rows as $r ) : ?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-88-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-89-					  <?php
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-90-					  $initiator_id = (int) $r->thread_created_by;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-91-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-92-					  $first = trim( (string) get_user_meta( $initiator_id, 'first_name', true ) );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-93-					  $last  = trim( (string) get_user_meta( $initiator_id, 'last_name', true ) );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-94-					  $name  = trim( $first . ' ' . $last );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-95-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-96-					  if ( '' === $name ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-97-						$name = (string) get_the_author_meta( 'display_name', $initiator_id );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-98-					  }
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-99-					  if ( '' === $name ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-100-						$u = get_userdata( $initiator_id );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-101-						$name = ( $u && ! empty( $u->user_login ) ) ? $u->user_login : __( 'Unknown contributor', 'glandore' );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions-mobile.php-102-					  }
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-148-		);
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-149-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-150-		if ( $order_number < 1 ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-151-			$order_number = 1;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-152-		}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-153-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-154-		$new_block = glandore_cop_build_snapshot_block_for_contribution( $contribution_id, $order_number );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-155-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-156-		if ( '' === $new_block ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-157-			return $prev_content;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-158-		}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-159-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-160-		if ( '' === trim( $prev_content ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-161-			return $new_block;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-162-		}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-163-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-164-		return $prev_content . "\n\n" . $new_block;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-165-	}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-166-}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-167-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php:168:// Resolve CoP contributor row for this user (induction gate).
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-169-$cop_contributor = glandore_cop_get_or_create_contributor_for_user( (int) $current_user_id );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-170-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-171-if ( ! $cop_contributor || empty( $cop_contributor->id ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-172-	wp_die(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-173-		esc_html__(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php:174:			'You must complete Community of Practice induction before creating discussions.',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-175-			'glandore'
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-176-		)
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-177-	);
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-178-}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-179-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-180-// -------------------------------------------------------------------------
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-181-// Reply mode vs new discussion mode.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-182-// -------------------------------------------------------------------------
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-183-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-184-$threads_table = $wpdb->prefix . 'cop_threads';
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-185-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-186-$cop_thread_id = isset( $_GET['cop_thread'] ) ? (int) $_GET['cop_thread'] : 0;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-187-$is_reply_mode = false;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-188-$thread_title  = '';
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-189-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-190-if ( $cop_thread_id > 0 ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-191-	$thread_row = $wpdb->get_row(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-192-		$wpdb->prepare(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-193-			"SELECT id, title FROM {$threads_table} WHERE id = %d",
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-194-			$cop_thread_id
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-195-		)
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-196-	);
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-197-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-198-	if ( $thread_row && ! empty( $thread_row->id ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-199-		$is_reply_mode = true;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-200-		$cop_thread_id = (int) $thread_row->id;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-201-		$thread_title  = (string) $thread_row->title;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-202-	}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-203-}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-204-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-205-$initial_title_value = $is_reply_mode ? $thread_title : '';
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-206-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-207-// -------------------------------------------------------------------------
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-208-// Recipient options (WP user IDs; excludes self; only users with bios).
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-209-// -------------------------------------------------------------------------
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-210-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-211-$recipient_users = get_users(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-212-	array(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php:213:		'meta_key'     => 'cop_profile_bio',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-214-		'meta_compare' => 'EXISTS',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-215-		'number'       => 200,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-216-	)
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-217-);
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-218-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-219-$recipient_options = array();
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-220-if ( $recipient_users ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-221-	foreach ( $recipient_users as $u ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-222-		if ( (int) $u->ID === (int) $current_user_id ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-223-			continue;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-224-		}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-225-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-226-		$name = trim(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-227-			trim( (string) get_user_meta( $u->ID, 'first_name', true ) ) . ' ' .
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-228-			trim( (string) get_user_meta( $u->ID, 'last_name', true ) )
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-229-		);
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-230-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-231-		if ( '' === $name ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-232-			$name = $u->display_name;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-create-post.php-233-		}
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-3- * Template Name: Community
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-4- */
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-5-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-6-get_header();
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-7-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-8-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-9- * Artefacts surfaced on the CoP page.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-10- * Canonical hierarchy enforced via explicit parent.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-11- */
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-12-$artefacts = [
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-13-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-14-    [
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-15-        'title'  => 'Discussions. This provides registered users with read access to Contributions.',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-16-        'parent' => null,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-17-        'url'    => home_url( '/community-discussions/' ),
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-18-    ],
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-19-    
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-20-    [
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-21-        'title'  => 'Induction. This is required if you want to Contribute.',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-22-        'parent' => null,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php:23:        'url'    => home_url( '/induction/' ),
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-24-    ],
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-25-    
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-26-];
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-27-?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-28-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-29-<main id="main" class="split-layout">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-30-    <div class="page-split">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-31-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-32-        <!-- LEFT -->
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-33-        <div class="page-split-left">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-34-            <?php get_template_part('template_parts/content', 'community'); ?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-35-        </div>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-36-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-37-        <!-- RIGHT -->
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-38-        <div class="page-split-right">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-39-            <h4>Options</h4>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-40-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-41-            <?php
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-42-            if (!empty($artefacts)) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-community.php-43-                get_template_part(
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-23-global $wpdb;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-24-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-25-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-26- * Current contributor filter (server-side, persisted in URL).
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-27- */
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-28-$current_contributor = 'all';
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-29-if ( isset( $_GET['cop_view_as'] ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-30-	$current_contributor = sanitize_text_field( wp_unslash( $_GET['cop_view_as'] ) );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-31-	if ( '' === $current_contributor ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-32-		$current_contributor = 'all';
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-33-	}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-34-}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-35-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-36-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-37- * Build list of contributors.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-38- */
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-39-$cop_contributors = array();
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-40-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-41-$users = get_users(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-42-	array(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php:43:		'meta_key'     => 'cop_profile_bio',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-44-		'meta_compare' => 'EXISTS',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-45-		'number'       => 50,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-46-	)
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-47-);
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-48-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-49-if ( ! empty( $users ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-50-	foreach ( $users as $user ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php:51:		$bio = get_user_meta( $user->ID, 'cop_profile_bio', true );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-52-		if ( '' === $bio ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php:53:			$bio = get_user_meta( $user->ID, 'cop_profile_bio_original', true );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-54-		}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-55-		if ( '' === $bio ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-56-			continue;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-57-		}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-58-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-59-		$first_name = trim( (string) get_user_meta( $user->ID, 'first_name', true ) );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-60-		$last_name  = trim( (string) get_user_meta( $user->ID, 'last_name', true ) );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-61-		$name       = trim( $first_name . ' ' . $last_name );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-62-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-63-		if ( '' === $name ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-64-			$name = $user->display_name;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-65-		}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-66-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-67-		$cop_contributors[] = array(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-68-			'id'   => (string) $user->ID,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-69-			'name' => $name,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-70-			'bio'  => wp_kses_post( $bio ),
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-71-		);
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-72-	}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-73-}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-74-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php:75:$ariadne_bio = 'Ariadne is an AI Assistant who helps host and curate this Community of Practice. She supports induction, moderates contributions, and works with Julian to develop the methods and artefacts used here.';
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-76-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-77-$cop_contributors[] = array(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-78-	'id'   => 'ariadne',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-79-	'name' => 'Ariadne (digital Assistant)',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-80-	'bio'  => wp_kses_post( $ariadne_bio ),
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-81-);
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-82-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-83-$cop_bio_map = array();
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-84-foreach ( $cop_contributors as $c ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-85-	$cop_bio_map[ $c['id'] ] = $c['bio'];
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-86-}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-87-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-88-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-89- * Threads/snapshots tables.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-90- */
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-91-$threads_table   = $wpdb->prefix . 'cop_threads';
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-92-$snapshots_table = $wpdb->prefix . 'cop_snapshots';
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-93-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-94-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-95- * SERVER-SIDE filtering of discussions list by initiator.
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-345-	$cop_discussion_meta    = esc_html__( 'No discussions match the current filter.', 'glandore' );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-346-	$cop_discussion_content = '<p>' . esc_html__( 'Select a different contributor to view discussions.', 'glandore' ) . '</p>';
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-347-}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-348-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-349-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-350- * Post-in-context URL, preserving filter.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-351- */
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-352-$cop_discussion_post_url = add_query_arg(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-353-	array(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-354-		'cop_thread'  => $cop_thread_id,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-355-		'cop_view_as' => $current_contributor,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-356-	),
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-357-	home_url( '/community-new-post/' )
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-358-);
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-359-?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-360-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-361-<main id="primary" class="site-main cop-dialogue-main cop-discussions-page">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-362-	<div class="cop-dialogue-container">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-363-		<div class="entry-content">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-364-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php:365:			<h3 class="cop-induction-heading">Community discussions</h3>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-366-					
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-367-			<div class="cop-discussions-grid">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-368-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-369-				<!-- Top-left: Contributor -->
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-370-				<div class="cop-discussions-box cop-discussions-box--contributor">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-371-					<div class="cop-discussions-box-header">Contributor</div>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-372-					<div class="cop-discussions-box-body">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-373-						<div class="cop-contributor-select-block">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-374-							<label for="cop_view_as" class="cop-contributor-label">View from</label>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-375-							<select id="cop_view_as" name="cop_view_as" class="cop-contributor-select">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-376-								<option value="all" <?php selected( $current_contributor, 'all' ); ?>>All contributors</option>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-377-								<?php foreach ( $cop_contributors as $contrib ) : ?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-378-									<option value="<?php echo esc_attr( $contrib['id'] ); ?>" <?php selected( $current_contributor, (string) $contrib['id'] ); ?>>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-379-										<?php echo esc_html( $contrib['name'] ); ?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-380-									</option>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-381-								<?php endforeach; ?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-382-							</select>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-383-						</div>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-384-					</div>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-discussions.php-385-				</div>
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-1-<?php
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-2-/**
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-3- * Template Name: CoP – Induction
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-4- *
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php:5: * Community of Practice onboarding via a short induction form.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-6- *
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-7- * @package glandore
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-8- */
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-9-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-10-if ( ! defined( 'ABSPATH' ) ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-11-    exit;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-12-}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-13-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php:14:// Must be logged in for induction.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-15-if ( ! is_user_logged_in() ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-16-    wp_safe_redirect( wp_login_url( get_permalink() ) );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-17-    exit;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-18-}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-19-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-20-get_header();
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-21-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-22-$user_id = get_current_user_id();
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-23-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php:24:// Has this user already completed induction?
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-25-$is_complete = function_exists( 'glandore_cop_is_profile_complete' )
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-26-    ? glandore_cop_is_profile_complete( $user_id )
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-27-    : false;
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-28-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-29-// AJAX endpoint for JS.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-30-$ajax_url = admin_url( 'admin-ajax.php' );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-31-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-32-// Current bio for the review editor (fallback to original, if present).
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php:33:$bio_current = get_user_meta( $user_id, 'cop_profile_bio', true );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-34-if ( '' === $bio_current ) {
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php:35:    $bio_current = get_user_meta( $user_id, 'cop_profile_bio_original', true );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-36-}
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-37-?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-38-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-39-<main id="primary" class="site-main cop-dialogue-main">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-40-    <div class="cop-dialogue-container">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-41-        <div class="entry-content">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-42-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php:43:            <h3 class="cop-induction-heading">Induction</h3>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-44-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-45-            <?php if ( $is_complete ) : ?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-46-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-47-                <p>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-48-                    Induction is already complete, although it can be revisited if anything needs to be updated.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-49-                    You can still refine how your short public bio is worded below.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-50-                </p>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-51-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-52-            <?php else : ?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-53-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-54-                <p>Hello, I’m Ariadne, Julian’s digital assistant.</p>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-55-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-56-                <p>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-57-                    As you're new to the community and want to post, he's asked me to help you prepare a short bio
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-58-                    to introduce yourself to the rest of us. The only reason to do this step is if you want to share
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-59-                    your thoughts with the community in your own posts — if you're mainly here to read, that’s fine
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-60-                    and you don't need to do anything more.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-61-                </p>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-62-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-63-                <p>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-64-                    The questions below are straightforward. They help us understand who is here, what kind of work
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-65-                    they’re doing, and how we can support their interests.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-66-                </p>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-67-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-68-            <?php endif; ?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-69-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-70-            <form
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php:71:                id="cop-induction-form"
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php:72:                class="cop-induction-form"
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-73-                method="post"
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-74-                action=""
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-75-                data-ajax-url="<?php echo esc_url( $ajax_url ); ?>"
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-76-            >
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php:77:                <?php wp_nonce_field( 'glandore_cop_induction', 'cop_induction_nonce' ); ?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-78-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-79-                <!-- Who you are -->
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-80-                <div class="field">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-81-                    <label for="cop_who">How would you briefly describe who you are?</label>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-82-                    <?php
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-83-                    wp_editor(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-84-                        '',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-85-                        'cop_who',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-86-                        array(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-87-                            'textarea_name' => 'who',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-88-                            'media_buttons' => false,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-89-                            'teeny'         => true,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-90-                            'quicktags'     => false,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-91-                            'textarea_rows' => 5,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-92-                            'editor_height' => 200,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-93-                        )
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-94-                    );
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-95-                    ?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-96-                </div>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-97-
+--
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-213-                    <label>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-214-                        <input type="checkbox" name="open_source" value="1" />
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-215-                        I understand all material on the site is shared under the Creative Commons Attribution-ShareAlike 4.0 licence.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-216-                    </label>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-217-                </div>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-218-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-219-                <div class="field">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-220-                    <label>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-221-                        <input type="checkbox" name="profile_visible" value="1" />
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-222-                        I’m comfortable for this profile (excluding my email address) to be visible to other members.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-223-                    </label>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-224-                </div>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-225-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-226-                <div class="field">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-227-                    <label>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-228-                        <input type="checkbox" name="ethos_accepted" value="1" />
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-229-                        I will treat this space as a place for thoughtful, good-faith conversation, not quick takes or advertising.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-230-                    </label>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-231-                </div>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-232-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php:233:                <div class="field cop-induction-actions">
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-234-                    <button type="submit">Send</button>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-235-                </div>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-236-            </form>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-237-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-238-            <!-- Result / messages from the gatekeeper -->
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php:239:            <div id="cop-induction-result" class="cop-induction-result"></div>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-240-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-241-            <!-- Bio review block (TinyMCE) -->
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-242-            <div
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-243-                id="cop-bio-review-wrapper"
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-244-                class="cop-bio-review"
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-245-                <?php echo $is_complete ? '' : 'style="display:none"'; ?>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-246-            >
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-247-                <p>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-248-                    <strong>Review your bio.</strong>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-249-                    This is how you will appear on the Contributors list. Julian is happy for you to adjust
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-250-                    the wording or pronouns, as long as it remains accurate and in good faith.
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-251-                </p>
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-252-
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-253-                <?php
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-254-                wp_editor(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-255-                    $bio_current,
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-256-                    'cop_bio_review',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-257-                    array(
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-258-                        'textarea_name' => 'cop_bio_review',
+/var/www/glandore.com/public/wp-content/themes/glandore/page-cop-about-dialogue.php-259-                        'media_buttons' => false,

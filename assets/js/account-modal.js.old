@@ -1,0 +1,72 @@
+/* global window, document */
+
+(function () {
+	"use strict";
+
+	function log(stage, extra) {
+		if (!window.console || !console.log) return;
+		var payload = extra || {};
+		payload.stage = stage;
+		console.log("[GACC_JS]", payload);
+	}
+
+	var modal = document.getElementById("glandore-account-modal");
+	if (!modal) {
+		log("no_modal_in_dom");
+		return;
+	}
+
+	log("init_start");
+
+	var openers = document.querySelectorAll('[data-account-open-modal="true"]');
+	var closers = modal.querySelectorAll("[data-modal-close]");
+	var lastFocusedElement = null;
+
+	function openModal(e) {
+		if (e) e.preventDefault();
+
+		lastFocusedElement = document.activeElement;
+
+		modal.removeAttribute("hidden");
+		modal.setAttribute("aria-hidden", "false");
+
+		var focusable = modal.querySelector(
+			"button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"
+		);
+		if (focusable) {
+			focusable.focus();
+		}
+
+		document.addEventListener("keydown", onKeyDown);
+		log("opened");
+	}
+
+	function closeModal() {
+		modal.setAttribute("hidden", "");
+		modal.setAttribute("aria-hidden", "true");
+
+		document.removeEventListener("keydown", onKeyDown);
+
+		if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+			lastFocusedElement.focus();
+		}
+
+		log("closed");
+	}
+
+	function onKeyDown(e) {
+		if (e.key === "Escape" || e.key === "Esc") {
+			closeModal();
+		}
+	}
+
+	openers.forEach(function (link) {
+		link.addEventListener("click", openModal);
+	});
+
+	closers.forEach(function (el) {
+		el.addEventListener("click", closeModal);
+	});
+
+	log("init_complete", { openerCount: openers.length });
+})();

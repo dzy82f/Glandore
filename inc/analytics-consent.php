@@ -1,0 +1,51 @@
+<?php
+/**
+ * Glandore – Matomo analytics
+ *
+ * Loads Matomo tracking for glandore.com.
+ * Self-hosted Matomo endpoint:
+ * https://analytics.glandore.com/
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Output Matomo tracking code in <head>.
+ */
+function glandore_output_matomo_tracking_code() {
+
+	// Do not track WP admin screens.
+	if ( is_admin() ) {
+		return;
+	}
+
+	?>
+	<!-- Matomo -->
+	<script>
+	var _paq = window._paq = window._paq || [];
+
+	_paq.push(['trackPageView']);
+	_paq.push(['enableLinkTracking']);
+
+	(function() {
+		var u = "https://analytics.glandore.com/";
+
+		_paq.push(['setTrackerUrl', u + 'matomo.php']);
+		_paq.push(['setSiteId', '1']);
+
+		var d = document,
+			g = d.createElement('script'),
+			s = d.getElementsByTagName('script')[0];
+
+		g.async = true;
+		g.src = u + 'matomo.js';
+		s.parentNode.insertBefore(g, s);
+	})();
+	</script>
+	<!-- End Matomo -->
+	<?php
+}
+
+add_action( 'wp_head', 'glandore_output_matomo_tracking_code', 20 );

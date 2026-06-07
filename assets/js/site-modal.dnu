@@ -1,0 +1,70 @@
+document.addEventListener('DOMContentLoaded', function () {
+
+    var overlay = document.getElementById('glandore-site-modal-overlay');
+    var modal   = document.getElementById('glandore-site-modal');
+    var panel   = document.getElementById('glandore-site-modal-panel');
+    var closeBtn= document.getElementById('glandore-site-modal-close');
+
+    if (!overlay || !modal || !panel) return;
+
+    function openModal() {
+        overlay.hidden = false;
+        modal.hidden   = false;
+        document.documentElement.classList.add('glandore-site-modal-open');
+    }
+
+    function closeModal() {
+        overlay.hidden = true;
+        modal.hidden   = true;
+        document.documentElement.classList.remove('glandore-site-modal-open');
+        panel.innerHTML = '';
+    }
+
+    function loadUrl(url) {
+        panel.innerHTML = '<div class="glandore-site-modal-loading">Loading…</div>';
+        openModal();
+
+        fetch(url, { credentials: 'same-origin' })
+            .then(function (r) { return r.text(); })
+            .then(function (html) {
+                var doc = new DOMParser().parseFromString(html, 'text/html');
+
+                // Extract only the URM account block to avoid nested headers/footers.
+                var extracted =
+                    doc.querySelector('.user-registration') ||
+                    doc.querySelector('.user-registration-MyAccount') ||
+                    doc.querySelector('main');
+
+                if (!extracted) {
+                    panel.innerHTML = '<div class="glandore-site-modal-error">Could not load content.</div>';
+                    return;
+                }
+
+                // If we got the inner block, wrap it so your URM CSS still targets it.
+                if (extracted.classList && extracted.classList.contains('user-registration-MyAccount')) {
+                    panel.innerHTML = '<div class="user-registration">' + extracted.outerHTML + '</div>';
+                } else {
+                    panel.innerHTML = extracted.outerHTML;
+                }
+            })
+            .catch(function () {
+                panel.innerHTML = '<div class="glandore-site-modal-error">Could not load content.</div>';
+            });
+    }
+
+    // Bind any link with data-modal-url (including your Account link)
+    document.addEventListener('click', function (e) {
+        var a = e.target.closest('a[data-modal-url]');
+        if (!a) return;
+
+        e.preventDefault();
+        loadUrl(a.getAttribute('data-modal-url'));
+    });
+
+    overlay.addEventListener('click', closeModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeModal();
+    });
+});

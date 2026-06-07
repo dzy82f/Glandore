@@ -1,0 +1,67 @@
+<?php
+/**
+ * Template Name: Systems
+ */
+
+get_header();
+
+/**
+ * Artefacts surfaced on the Systems page.
+ * URLs may point to pages or directly to PDFs.
+ * Null URLs indicate placeholders.
+ */
+$artefacts = [
+    [
+        'title' => 'Complex Adaptive Systems',
+        'url'   => '/complex-adaptive-systems/',
+    ],
+    [
+        'title' => 'Wicked Problems',
+        'url'   => '/wicked-problems/',
+    ],
+    [
+        'title' => 'Causal Loop Diagrams',
+        'url'   => null,
+    ],
+    [
+        'title' => 'Leadership in a VUCA World',
+        'url'   => '/wp-content/uploads/2025/11/Leadership_v0_2.pdf',
+    ],
+    [
+        'title' => 'The Well Run Organisation',
+        'url'   => '/wp-content/uploads/2025/10/The_Well_Run_Organisation_v0_1.pdf',
+    ],
+    [
+        'title' => 'Lessons on Innovation and Credibility',
+        'url'   => '/wp-content/uploads/2025/10/Lessons_on_innovation_and_credibility_v1_0-1.pdf',
+    ],
+    [
+        'title' => 'Can Personas Think?',
+        'url'   => '/wp-content/uploads/2025/08/Orchard_v1.0.pdf',
+    ],
+];
+?>
+
+<main id="main" class="split-layout">
+
+    <div class="page-split">
+
+        <!-- LEFT -->
+        <div class="page-split-left">
+            <?php get_template_part('template_parts/content', 'systems'); ?>
+        </div>
+
+        <!-- RIGHT -->
+        <aside class="page-split-right">
+            <?php
+            get_template_part(
+                'template_parts/artefact-list',
+                null,
+                ['artefacts' => $artefacts]
+            );
+            ?>
+        </aside>
+
+    </div>
+
+</main>

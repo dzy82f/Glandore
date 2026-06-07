@@ -1,0 +1,16 @@
+<div class="field">
+	<label for="dropdown">Location</label>
+	<select name="dropdown" id="dropdown">
+	  <option value="">- Please select -</option>
+	  <option value="UK">UK</option>
+	  <option value="USA and Canada">USA and Canada</option>
+	  <option value="Europe">Europe</option>
+	  <option value="Australia and New Zealand">Australia and New Zealand</option>
+	  <option value="China">China</option>
+	  <option value="India">India</option>
+	  <option value="Asia (Other)">Asia (Other)</option>
+	  <option value="Africa and the Middle East">Africa and the Middle East</option>
+	  <option value="Latin America and the Caribbean">Latin America and the Caribbean</option>
+	  <option value="Other / prefer not to say">Other / prefer not to say</option>
+	</select>
+</div>

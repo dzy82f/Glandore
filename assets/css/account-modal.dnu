@@ -1,0 +1,149 @@
+/* ===============================
+   Account modals – small card design
+   Applies to:
+   - #glandore-modal-account
+   - #glandore-modal-account-profile
+   - #glandore-modal-lost-password
+   =============================== */
+
+/* BACKDROP LAYER */
+#glandore-modal-account.auth-modal,
+#glandore-modal-account-profile.auth-modal,
+#glandore-modal-lost-password.auth-modal {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  /* centre baseline, we’ll offset via margin on the dialog */
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+/* Hidden state */
+#glandore-modal-account[hidden],
+#glandore-modal-account-profile[hidden],
+#glandore-modal-lost-password[hidden] {
+  display: none !important;
+}
+
+/* Backdrop */
+#glandore-modal-account .auth-modal__backdrop,
+#glandore-modal-account-profile .auth-modal__backdrop,
+#glandore-modal-lost-password .auth-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* DIALOG CARD – small card */
+#glandore-modal-account .auth-modal__dialog,
+#glandore-modal-account-profile .auth-modal__dialog,
+#glandore-modal-lost-password .auth-modal__dialog {
+  position: relative;
+  width: min(420px, calc(100vw - 112px));
+  background: #fff;
+  border-radius: 18px;
+  border: 2px solid #111;
+  box-shadow: 0 18px 45px rgba(0,0,0,0.20), 0 3px 12px rgba(0,0,0,0.14);
+  padding: 18px 18px 20px 18px;
+  z-index: 1;
+  /* Offset from the centred position: down + right */
+  margin: 60px 0 0 120px; /* top, right, bottom, left */
+}
+
+/* Close button */
+#glandore-modal-account .auth-modal__close,
+#glandore-modal-account-profile .auth-modal__close,
+#glandore-modal-lost-password .auth-modal__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: 0;
+  background: transparent;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  color: #111;
+}
+
+/* ===============================
+   Panel typography & actions
+   (shared styles for headings, lists, etc.)
+   =============================== */
+
+.account-panel-title {
+  margin: 0 0 10px 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--tychevia-blue);
+}
+
+/* Left-aligned body so bullets line up correctly */
+.account-panel-body {
+  font-size: 14px;
+  color: #111;
+  text-align: left;
+}
+
+/* Welcome centred */
+.account-panel-welcome {
+  margin: 8px 0 10px 0;
+  text-align: center;
+}
+
+.account-panel-avatar {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: #eee;
+  margin: 10px auto 14px auto;
+}
+
+.account-panel-intro {
+  margin: 10px 0 10px 0;
+}
+
+/* Normal bullets; kill global diamond bullets */
+.account-panel-actions {
+  margin: 10px 0 0 0;
+  padding-left: 18px;
+  list-style-type: disc;
+  list-style-position: outside;
+}
+
+.account-panel-actions li::before {
+  content: none !important;
+}
+
+.account-panel-actions li {
+  margin: 6px 0;
+}
+
+.account-panel-actions a {
+  color: #111;
+  text-decoration: none;
+}
+
+.account-panel-actions a:hover {
+  text-decoration: underline;
+}
+
+/* Misc */
+.account-panel-actions-cta {
+  margin: 12px 0 0 0;
+}
+
+.account-panel-primary {
+  display: inline-block;
+  padding: 10px 12px;
+  border: 2px solid #111;
+  text-decoration: none;
+  color: #111;
+}
+
+.glandore-account-loading,
+.glandore-account-error {
+  font-size: 14px;
+  padding: 10px 0;
+}

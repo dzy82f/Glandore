@@ -1,0 +1,105 @@
+<?php
+/**
+ * Glandore Access Gate
+ *
+ * Enforce "logged-in only" access for the site, while allowing
+ * specific public entry points (registration, email verification, login).
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+/**
+ * Normalise the current request path.
+ *
+ * - Strips query string.
+ * - Ensures leading slash.
+ * - Adds trailing slash for normal pages, but leaves *.php alone.
+ *
+ * @return string
+ */
+function glandore_get_request_path() {
+    $uri  = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '/';
+    $path = strtok( $uri, '?' ); // strip query string
+
+    if ( ! $path ) {
+        $path = '/';
+    }
+
+    // Ensure leading slash.
+    if ( $path[0] !== '/' ) {
+        $path = '/' . ltrim( $path, '/' );
+    }
+
+    // Do not add trailing slash to .php endpoints.
+    if ( substr( $path, -4 ) !== '.php' ) {
+        $path = trailingslashit( $path );
+    }
+
+    return $path;
+}
+
+/**
+ * Enforce members-only access.
+ */
+function glandore_access_gate() {
+
+    // Never interfere with admin, AJAX, REST, cron, or CLI.
+    if (
+        is_admin() ||
+        wp_doing_ajax() ||
+        wp_doing_cron() ||
+        ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ||
+        ( defined( 'WP_CLI' ) && WP_CLI )
+    ) {
+        return;
+    }
+
+    // Allow URM email confirmation (token-based, stateless).
+    if ( isset( $_GET['ur_token'] ) ) {
+        return;
+    }
+
+    // Logged-in users are always allowed.
+	
+	// TEMPORARY BYPASS TO AVOID LOCKOUT.
+    return;
+	
+    if ( is_user_logged_in() ) {
+        return;
+    }
+
+    $request_path = glandore_get_request_path();
+
+    // Normalise home path (usually "/").
+    $home_path = wp_parse_url( home_url( '/' ), PHP_URL_PATH );
+    if ( ! $home_path ) {
+        $home_path = '/';
+    }
+    $home_path = trailingslashit( $home_path );
+
+    // Public entry points.
+    $public_paths = array(
+        $home_path,
+        '/login/',
+        '/logon/',
+        '/register/',
+        '/registration/',
+        '/user-registration/',
+        '/user-email-validation/',
+        '/lost-password/',
+        '/reset-password/',
+        '/wp-login.php',
+    );
+
+    if ( in_array( $request_path, $public_paths, true ) ) {
+        return;
+    }
+
+    // Everything else: block anonymous access.
+    wp_safe_redirect( home_url( '/' ) );
+    exit;
+}
+
+add_action( 'template_redirect', 'glandore_access_gate', 9 );

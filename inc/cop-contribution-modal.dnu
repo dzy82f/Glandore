@@ -1,0 +1,364 @@
+<?php
+/**
+ * Community of Practice – Contribution Modal + Handler
+ *
+ * @package glandore
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Render the CoP contribution modal in the footer.
+ */
+function glandore_render_cop_contribution_modal() {
+
+	// Restrict to logged-in users only (for now).
+	$current_user = wp_get_current_user();
+	$user_id      = ( $current_user && $current_user->exists() ) ? $current_user->ID : 0;
+
+	if ( ! $user_id ) {
+		return;
+	}
+
+	// Friendly "From" label: first_name → nickname → display_name.
+	$from_label = '';
+	if ( $user_id ) {
+		$first_name = get_user_meta( $user_id, 'first_name', true );
+		$nickname   = get_user_meta( $user_id, 'nickname', true );
+
+		if ( ! empty( $first_name ) ) {
+			$from_label = $first_name;
+		} elseif ( ! empty( $nickname ) ) {
+			$from_label = $nickname;
+		} else {
+			$from_label = $current_user->display_name;
+		}
+	}
+
+	// Fetch canopies.
+	$canopies = [];
+	if ( taxonomy_exists( 'cop_canopy' ) ) {
+		$terms = get_terms(
+			[
+				'taxonomy'   => 'cop_canopy',
+				'hide_empty' => false,
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+			]
+		);
+		if ( ! is_wp_error( $terms ) ) {
+			$canopies = $terms;
+		}
+	}
+
+	// Fetch threads.
+	$threads = [];
+	if ( post_type_exists( 'cop_thread' ) ) {
+		$threads = get_posts(
+			[
+				'post_type'      => 'cop_thread',
+				'posts_per_page' => -1,
+				'orderby'        => 'date',
+				'order'          => 'ASC',
+			]
+		);
+	}
+	?>
+
+	<div
+		id="glandore-modal-contribution"
+		class="auth-modal auth-modal--contribution"
+		aria-hidden="true"
+	>
+		<div class="auth-modal__overlay" data-glandore-modal-close></div>
+
+		<div
+			class="auth-modal__dialog"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="glandore-modal-contribution-title"
+		>
+			<button
+				type="button"
+				class="auth-modal__close"
+				data-glandore-modal-close
+				aria-label="<?php esc_attr_e( 'Close', 'glandore' ); ?>"
+			>&times;</button>
+
+			<header class="auth-modal__header">
+				<h2 id="glandore-modal-contribution-title" class="auth-modal__title">
+					<?php esc_html_e( 'New contribution', 'glandore' ); ?>
+				</h2>
+				<p class="auth-modal__subtitle">
+					<?php esc_html_e( 'Select the target canopy and thread, then add rich–text content.', 'glandore' ); ?>
+				</p>
+			</header>
+
+			<div class="auth-modal__body component-scroll cop-contribution-scroll">
+				<form
+					method="post"
+					class="cop-contribution-form"
+					id="cop-contribution-form"
+				>
+					<?php wp_nonce_field( 'glandore_cop_contribution', 'glandore_cop_contribution_nonce' ); ?>
+
+					<input type="hidden" name="cop_contribution_action" value="submit_contribution">
+					<input type="hidden" name="cop_from_user_id" value="<?php echo esc_attr( $user_id ); ?>">
+
+					<!-- From (display only) -->
+					<div class="cop-contribution-field">
+						<label class="cop-contribution-label"><?php esc_html_e( 'From', 'glandore' ); ?></label>
+						<div class="cop-contribution-from">
+							<?php
+							if ( $from_label ) {
+								echo esc_html( $from_label );
+							} else {
+								esc_html_e( '(not logged in)', 'glandore' );
+							}
+							?>
+						</div>
+					</div>
+
+					<!-- To -->
+					<div class="cop-contribution-field">
+						<label for="cop_to" class="cop-contribution-label"><?php esc_html_e( 'To', 'glandore' ); ?></label>
+						<select name="cop_to" id="cop_to" class="cop-contribution-select">
+							<option value="all"><?php esc_html_e( 'All', 'glandore' ); ?></option>
+							<option value="tychevia"><?php esc_html_e( 'Tychevia (steward request)', 'glandore' ); ?></option>
+						</select>
+					</div>
+
+					<!-- Canopy -->
+					<div class="cop-contribution-field">
+						<label for="cop_canopy_id" class="cop-contribution-label">
+							<?php esc_html_e( 'Canopy', 'glandore' ); ?>
+						</label>
+						<select
+							name="cop_canopy_id"
+							id="cop_canopy_id"
+							class="cop-contribution-select"
+							required
+						>
+							<option value="">
+								<?php esc_html_e( 'Select a canopy', 'glandore' ); ?>
+							</option>
+							<?php foreach ( $canopies as $canopy ) : ?>
+								<option value="<?php echo esc_attr( $canopy->term_id ); ?>">
+									<?php echo esc_html( $canopy->name ); ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+
+					<!-- Thread -->
+					<div class="cop-contribution-field">
+						<label for="cop_thread_id" class="cop-contribution-label">
+							<?php esc_html_e( 'Thread', 'glandore' ); ?>
+						</label>
+						<select
+							name="cop_thread_id"
+							id="cop_thread_id"
+							class="cop-contribution-select"
+							required
+						>
+							<option value="new">
+								<?php esc_html_e( 'Start a new thread in this canopy', 'glandore' ); ?>
+							</option>
+							<?php foreach ( $threads as $thread ) : ?>
+								<?php
+								$canopy_ids = [];
+								if ( taxonomy_exists( 'cop_canopy' ) ) {
+									$thread_terms = wp_get_post_terms( $thread->ID, 'cop_canopy' );
+									if ( ! is_wp_error( $thread_terms ) ) {
+										$canopy_ids = wp_list_pluck( $thread_terms, 'term_id' );
+									}
+								}
+								$canopy_id_attr = $canopy_ids ? (int) $canopy_ids[0] : '';
+								?>
+								<option
+									value="<?php echo esc_attr( $thread->ID ); ?>"
+									<?php if ( $canopy_id_attr ) : ?>
+										data-cop-canopy-id="<?php echo esc_attr( $canopy_id_attr ); ?>"
+									<?php endif; ?>
+								>
+									<?php echo esc_html( get_the_title( $thread ) ); ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
+						<p class="cop-contribution-help">
+							<?php esc_html_e( 'Choosing “Start a new thread in this canopy” creates a new thread; choosing an existing thread adds a contribution to that thread.', 'glandore' ); ?>
+						</p>
+					</div>
+
+					<!-- Thread title (only when creating a new thread) -->
+					<div class="cop-contribution-field" id="cop_thread_title_wrapper">
+						<label for="cop_thread_title" class="cop-contribution-label">
+							<?php esc_html_e( 'Thread title (for new threads)', 'glandore' ); ?>
+						</label>
+						<input
+							type="text"
+							name="cop_thread_title"
+							id="cop_thread_title"
+							class="cop-contribution-input"
+							placeholder="<?php esc_attr_e( 'Provisional thread title', 'glandore' ); ?>"
+						>
+					</div>
+
+					<!-- Rich-text content -->
+					<div class="cop-contribution-field">
+						<label for="cop_content" class="cop-contribution-label">
+							<?php esc_html_e( 'Content', 'glandore' ); ?>
+						</label>
+						<?php
+						wp_editor(
+							'',
+							'cop_content',
+							[
+								'textarea_name' => 'cop_content',
+								'media_buttons' => false,
+								'teeny'         => true,
+								'quicktags'     => true,
+								'editor_height' => 180,
+							]
+						);
+						?>
+					</div>
+
+					<div class="cop-contribution-actions">
+						<button
+							type="submit"
+							class="button button-primary cop-contribution-submit"
+						>
+							<?php esc_html_e( 'Submit', 'glandore' ); ?>
+						</button>
+						<button
+							type="button"
+							class="button cop-contribution-cancel"
+							data-glandore-modal-close
+						>
+							<?php esc_html_e( 'Cancel', 'glandore' ); ?>
+						</button>
+					</div>
+				</form>
+			</div><!-- .auth-modal__body -->
+		</div><!-- .auth-modal__dialog -->
+	</div><!-- #glandore-modal-contribution -->
+
+	<?php
+}
+add_action( 'wp_footer', 'glandore_render_cop_contribution_modal' );
+
+/**
+ * Handle CoP contribution submissions.
+ *
+ * - If cop_thread_id = 'new'  → create a new cop_thread in the chosen canopy.
+ * - Else                      → add a comment to the chosen cop_thread.
+ */
+function glandore_handle_cop_contribution() {
+
+	if (
+		empty( $_POST['cop_contribution_action'] ) ||
+		'submit_contribution' !== $_POST['cop_contribution_action']
+	) {
+		return;
+	}
+
+	// Nonce.
+	if (
+		empty( $_POST['glandore_cop_contribution_nonce'] ) ||
+		! wp_verify_nonce(
+			$_POST['glandore_cop_contribution_nonce'],
+			'glandore_cop_contribution'
+		)
+	) {
+		return;
+	}
+
+	// Require logged-in user.
+	$user_id = get_current_user_id();
+	if ( ! $user_id ) {
+		return;
+	}
+
+	$canopy_id     = isset( $_POST['cop_canopy_id'] ) ? (int) $_POST['cop_canopy_id'] : 0;
+	$thread_id_raw = isset( $_POST['cop_thread_id'] ) ? wp_unslash( $_POST['cop_thread_id'] ) : '';
+	$thread_title  = isset( $_POST['cop_thread_title'] ) ? sanitize_text_field( wp_unslash( $_POST['cop_thread_title'] ) ) : '';
+	$content_raw   = isset( $_POST['cop_content'] ) ? wp_unslash( $_POST['cop_content'] ) : '';
+	$content       = wp_kses_post( $content_raw );
+	$cop_to        = isset( $_POST['cop_to'] ) ? sanitize_text_field( wp_unslash( $_POST['cop_to'] ) ) : 'all';
+
+	if ( '' === trim( $content ) ) {
+		return;
+	}
+
+	$target_thread_id = 0;
+
+	// Case 1: new thread in existing canopy.
+	if ( 'new' === $thread_id_raw ) {
+
+		if ( ! $canopy_id || '' === $thread_title ) {
+			return;
+		}
+
+		$thread_id = wp_insert_post(
+			[
+				'post_type'    => 'cop_thread',
+				'post_status'  => 'publish',
+				'post_title'   => $thread_title,
+				'post_content' => $content,
+				'post_author'  => $user_id,
+			]
+		);
+
+		if ( is_wp_error( $thread_id ) || ! $thread_id ) {
+			return;
+		}
+
+		$target_thread_id = (int) $thread_id;
+
+		if ( taxonomy_exists( 'cop_canopy' ) ) {
+			wp_set_post_terms( $target_thread_id, [ $canopy_id ], 'cop_canopy' );
+		}
+
+		// Store "To" as post meta for future routing/analytics.
+		if ( $cop_to ) {
+			update_post_meta( $target_thread_id, '_cop_to', $cop_to );
+		}
+
+	} else {
+		// Case 2: add contribution to existing thread.
+		$target_thread_id = (int) $thread_id_raw;
+		if ( ! $target_thread_id ) {
+			return;
+		}
+
+		$current_user = wp_get_current_user();
+
+		$commentdata = [
+			'comment_post_ID'      => $target_thread_id,
+			'comment_author'       => $current_user->display_name,
+			'comment_author_email' => $current_user->user_email,
+			'comment_content'      => $content,
+			'user_id'              => $user_id,
+			'comment_approved'     => 1, // future hook: moderation by Ariadne.
+		];
+
+		$comment_id = wp_new_comment( $commentdata );
+
+		if ( $comment_id && $cop_to ) {
+			add_comment_meta( $comment_id, '_cop_to', $cop_to, true );
+		}
+	}
+
+	// Redirect to the relevant thread page.
+	if ( $target_thread_id ) {
+		$redirect = get_permalink( $target_thread_id );
+		if ( $redirect ) {
+			wp_safe_redirect( $redirect );
+			exit;
+		}
+	}
+}
+add_action( 'template_redirect', 'glandore_handle_cop_contribution' );

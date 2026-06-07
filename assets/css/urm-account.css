@@ -1,0 +1,176 @@
+/* --------------------------------------------------------
+   URM My Account restyle (Glandore) — v2
+   DOM verified on site:
+   .user-registration
+   .user-registration-MyAccount
+   .user-registration-MyAccount-navigation
+   .user-registration-MyAccount-content
+   -------------------------------------------------------- */
+
+.user-registration {
+  max-width: 980px;
+  margin: var(--space-24) auto;
+}
+
+/* Main card */
+.user-registration .user-registration-MyAccount {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+}
+
+/* Top navigation bar */
+.user-registration .user-registration-MyAccount-navigation {
+  padding: 0;
+  background: rgba(0, 0, 0, 0.22);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+/* Tabs list */
+.user-registration .user-registration-MyAccount-navigation ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Tab links */
+.user-registration .user-registration-MyAccount-navigation ul li a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  color: rgba(255, 255, 255, 0.90);
+  text-decoration: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.user-registration .user-registration-MyAccount-navigation ul li a:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Active tab (URM uses either .active or .is-active depending on version) */
+.user-registration .user-registration-MyAccount-navigation ul li.active > a,
+.user-registration .user-registration-MyAccount-navigation ul li.is-active > a {
+  background: rgba(0, 166, 255, 0.14);
+  border-bottom: 2px solid rgba(0, 166, 255, 0.65);
+  color: #fff;
+}
+
+/* Content area */
+.user-registration .user-registration-MyAccount-content {
+  padding: var(--space-24);
+}
+
+/* Headings */
+.user-registration .user-registration-MyAccount-content h2,
+.user-registration .user-registration-MyAccount-content h3 {
+  margin: 0 0 var(--space-16) 0;
+  font-weight: 600;
+}
+
+/* Paragraph text */
+.user-registration .user-registration-MyAccount-content p {
+  margin: 0 0 var(--space-12) 0;
+}
+
+/* Links */
+.user-registration .user-registration-MyAccount-content a,
+.user-registration .user-registration-MyAccount-navigation a {
+  color: var(--tychevia-blue);
+}
+
+/* Form controls inside account area */
+.user-registration .user-registration-MyAccount-content input[type="text"],
+.user-registration .user-registration-MyAccount-content input[type="email"],
+.user-registration .user-registration-MyAccount-content input[type="password"],
+.user-registration .user-registration-MyAccount-content input[type="url"],
+.user-registration .user-registration-MyAccount-content input[type="tel"],
+.user-registration .user-registration-MyAccount-content textarea,
+.user-registration .user-registration-MyAccount-content select {
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.22);
+  color: #fff;
+  outline: none;
+}
+
+.user-registration .user-registration-MyAccount-content input:focus,
+.user-registration .user-registration-MyAccount-content textarea:focus,
+.user-registration .user-registration-MyAccount-content select:focus {
+  border-color: rgba(255, 255, 255, 0.26);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.22);
+}
+
+/* Buttons */
+.user-registration .user-registration-MyAccount-content button,
+.user-registration .user-registration-MyAccount-content input[type="submit"],
+.user-registration .user-registration-MyAccount-content .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 166, 255, 0.35);
+  background: rgba(0, 166, 255, 0.14);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.user-registration .user-registration-MyAccount-content button:hover,
+.user-registration .user-registration-MyAccount-content input[type="submit"]:hover,
+.user-registration .user-registration-MyAccount-content .button:hover {
+  background: rgba(0, 166, 255, 0.20);
+}
+
+/* Mobile */
+@media (max-width: 780px) {
+  .user-registration {
+    margin: var(--space-16);
+  }
+
+  .user-registration .user-registration-MyAccount-content {
+    padding: var(--space-16);
+  }
+
+  .user-registration .user-registration-MyAccount-navigation ul li a {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* --------------------------------------------------------
+   URM nav bar override (wins against plugin specificity)
+   -------------------------------------------------------- */
+.user-registration .user-registration-MyAccount .user-registration-MyAccount-navigation {
+  background: rgba(0, 0, 0, 0.22) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10) !important;
+}
+
+/* If URM is styling the UL itself */
+.user-registration .user-registration-MyAccount .user-registration-MyAccount-navigation ul {
+  background: transparent !important;
+}
+
+/* Match Glandore modal-ish proportions */
+.user-registration {
+  max-width: 520px;
+  margin: var(--space-24) auto;
+}
+
+/* Keep the tabs readable */
+.user-registration .user-registration-MyAccount-navigation ul li a {
+  padding: 12px 14px;
+  font-size: var(--fs-sm);
+}

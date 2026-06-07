@@ -1,0 +1,67 @@
+body.issue-studio-print {
+	margin: 0;
+	background: #ffffff;
+	color: #111111;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11pt;
+	line-height: 1.5;
+}
+
+.isp-page {
+	max-width: 820px;
+	margin: 40px auto;
+	padding: 0 40px;
+}
+
+.isp-header {
+	margin-bottom: 32px;
+	border-bottom: 1px solid #dddddd;
+	padding-bottom: 18px;
+}
+
+.isp-kicker,
+.isp-meta {
+	margin: 0 0 8px;
+	font-size: 9.5pt;
+	color: #555555;
+}
+
+h1 {
+	margin: 0 0 10px;
+	font-size: 24pt;
+	line-height: 1.15;
+}
+
+h2 {
+	margin-top: 28px;
+	font-size: 16pt;
+}
+
+h3 {
+	margin-top: 20px;
+	font-size: 13pt;
+}
+
+p {
+	margin: 0 0 11px;
+}
+
+.isp-block {
+	margin-bottom: 18px;
+}
+
+@media print {
+	@page {
+		margin: 18mm;
+	}
+
+	.isp-page {
+		max-width: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	body.issue-studio-print {
+		font-size: 10.5pt;
+	}
+}

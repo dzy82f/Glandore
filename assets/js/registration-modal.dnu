@@ -1,0 +1,130 @@
+/**
+ * Glandore – Registration Modal (clean v2, CSS-aligned)
+ *
+ * Responsibilities:
+ *  - Open the "User Registration" modal
+ *  - Close it via:
+ *      • overlay/backdrop click
+ *      • close button
+ *      • Esc key
+ *  - Auto-open if URL contains ?registration_modal=1
+ *
+ * Notes:
+ *  - Explicitly controls display so we are not stuck on display:none.
+ *  - URM still handles form submit + redirect.
+ */
+
+(function (window, document) {
+    'use strict';
+
+    var modalId = 'glandore-modal-registration';
+    var modal   = document.getElementById(modalId);
+
+    if (!modal) {
+        return;
+    }
+
+    var overlay = modal.querySelector('.auth-modal__overlay, .auth-modal__backdrop');
+
+    function cleanQueryParams() {
+        try {
+            var url = new URL(window.location.href);
+
+            if (url.searchParams.has('registration_modal')) {
+                url.searchParams.delete('registration_modal');
+            }
+            if (url.searchParams.has('confirmed')) {
+                url.searchParams.delete('confirmed');
+            }
+
+            window.history.replaceState({}, '', url.toString());
+        } catch (e) {
+            // Older browsers or odd URLs – ignore.
+        }
+    }
+
+    function openModal() {
+        // Ensure it is actually visible
+        modal.style.display = 'flex';        // match .auth-modal flex layout
+        modal.removeAttribute('hidden');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('has-auth-modal-open');
+
+        // First focusable element in the modal for accessibility
+        var focusable = modal.querySelector(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable) {
+            focusable.focus();
+        }
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+        modal.setAttribute('hidden', 'hidden');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('has-auth-modal-open');
+        cleanQueryParams();
+    }
+
+    // Open triggers: e.g. <a data-open-registration-modal>
+    var triggers = document.querySelectorAll('[data-open-registration-modal]');
+    if (triggers.length) {
+        Array.prototype.forEach.call(triggers, function (trigger) {
+            trigger.addEventListener('click', function (event) {
+                event.preventDefault();
+                openModal();
+            });
+        });
+    }
+
+    // Close via overlay/backdrop click
+    if (overlay) {
+        overlay.addEventListener('click', function () {
+            closeModal();
+        });
+    }
+
+    // Close via explicit close buttons inside the modal
+    var closeButtons = modal.querySelectorAll('[data-auth-modal-close], [data-modal-close], .auth-modal__close');
+    if (closeButtons.length) {
+        Array.prototype.forEach.call(closeButtons, function (btn) {
+            btn.addEventListener('click', function (event) {
+                event.preventDefault();
+                closeModal();
+            });
+        });
+    }
+
+    // Close with Escape key
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' || event.key === 'Esc' || event.keyCode === 27) {
+            if (modal.getAttribute('aria-hidden') === 'false' && modal.style.display !== 'none') {
+                closeModal();
+            }
+        }
+    });
+
+    // Auto-open when URL has ?registration_modal=1 (or just ?registration_modal)
+    (function autoOpenFromQuery() {
+        var search = window.location.search || '';
+        if (!search) {
+            return;
+        }
+
+        try {
+            var params = new URLSearchParams(search);
+            if (params.has('registration_modal')) {
+                window.setTimeout(openModal, 50);
+                return;
+            }
+        } catch (e) {
+            // Fallback: simple substring check
+            if (search.indexOf('registration_modal=') !== -1 ||
+                search.indexOf('registration_modal') !== -1) {
+                window.setTimeout(openModal, 50);
+            }
+        }
+    })();
+
+})(window, document);

@@ -1,0 +1,39 @@
+<?php
+/**
+ * Registration Completion Modal – asset loader
+ *
+ * Responsibility:
+ *  - Always enqueue the completion modal JS on the front-end.
+ *  - No user-meta logic, no flag deletion.
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+/**
+ * Enqueue completion modal JS.
+ */
+function glandore_registration_completion_modal_assets() {
+
+    // Front-end only.
+    if ( is_admin() ) {
+        return;
+    }
+
+    $theme_uri = get_stylesheet_directory_uri();
+
+    wp_enqueue_script(
+        'glandore-registration-completion-modal',
+        $theme_uri . '/assets/js/registration-completion-modal.js',
+        array(),
+        '0.12',
+        true
+    );
+}
+
+add_action(
+    'wp_enqueue_scripts',
+    'glandore_registration_completion_modal_assets',
+    20
+);

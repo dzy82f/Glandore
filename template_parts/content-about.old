@@ -1,0 +1,68 @@
+<?php
+/**
+ * Template Part: About
+ * Description: 
+ */
+?>
+
+<?php
+/**
+ * Template Part: About Julian
+ * Description: Structured content block for the About Julian page.
+ */
+?>
+
+<section class="page-content">
+
+	<h4>Julian Macnamara</h4>
+
+	<p>
+        Julian's background spans consulting, leadership, organisational design, and a long
+        career of helping companies and institutions see the hidden forces shaping their world.
+        What he enjoys most is learning, refining, and building ideas with others —
+        especially when it pushes the boundary of what’s possible.
+    </p>
+
+    <p>
+        He is the founder of Glandore and the creator of
+        Tychevia® — a dialogue-driven approach to understanding complexity.
+        His work blends curiosity, practicality and a lifelong fascination with how real
+        systems behave. He builds things by exploring them: conversations, prototypes, frameworks, entire
+        epistemic engines. What begins as a question often becomes a method; what begins
+        as a pattern becomes a structure.
+	</p>		
+
+	<p>
+		Glandore.com is the public expression of
+        that practice — a living laboratory for complex adaptive systems, human judgement
+        and digital associates working together.
+    </p>    
+
+    <p>
+        Tychevia® is the latest example: an evolving, collaborative system built
+        not by instruction but through dialogue, reflection and shared discovery. It reflects
+        his belief that meaning is co-created, that good systems are always learning,
+        and that exploration is a discipline in its own right.
+    </p>
+
+    <p>
+        Above all, he brings a mix of rigour, playfulness and intellectual generosity.
+        He treats thinking as a craft, conversation as a tool, and complexity as something to
+        navigate — not fear. Glandore is an invitation into that world.
+    </p>
+	
+	<h4>Site build</h4>
+	
+	<p>
+	\emph{glandore.com} was built from the ground up in deliberate opposition to the constraints imposed by so-called \emph{code-free} site builders and heavily opinionated WordPress themes. Such tools often invert the proper relationship between developer and system, forcing the developer to adapt their thinking to the abstractions, conventions, and limitations embedded in the theme, rather than allowing the site architecture to arise from first principles.
+	</p>
+
+	<p>
+	To avoid this inversion, the site was implemented using the \emph{\_s} (Underscores) scaffold as a minimal structural base rather than a prescriptive theme framework. WordPress was treated strictly as a rendering and content-management layer. Pages are composed primarily from bespoke \texttt{.php} templates, with carefully constrained use of \texttt{.js} only where interaction genuinely requires it. This keeps behaviour explicit, traceable, and resistant to unintended coupling introduced by theme-level automation.
+	</p>
+
+	<p>
+	The development process itself mirrored this architectural philosophy. Rather than following a fixed specification or pre-defined component library, the site emerged through an interactive dialogue between a human designer and a digital Associate within the Tychevia framework. The human articulated intentions around layout, interaction, rhythm, and constraint; these were then examined, challenged, and refined through dialogue before being translated by the agent into concrete templates and scripts. In this way, both the structure of the site and the method of its creation prioritised intentionality, clarity, and mutual adjustment over convenience or automation.
+	</p>
+
+</section>
