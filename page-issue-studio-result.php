@@ -418,21 +418,6 @@ $print_url = add_query_arg(
 	home_url( '/issue-studio-print/' )
 );
 
-$chain_url = add_query_arg(
-	array(
-		'chain_from_artefact_id' => $artefact_id,
-		'chain_from_snapshot_id' => $snapshot ? absint( $snapshot->id ) : 0,
-	),
-	home_url( '/issue-studio/' )
-);
-
-wp_enqueue_style(
-	'glandore-issue-studio-result',
-	get_template_directory_uri() . '/assets/css/issue-studio-result.css',
-	array(),
-	filemtime( get_template_directory() . '/assets/css/issue-studio-result.css' )
-);
-
 get_header();
 ?>
 
